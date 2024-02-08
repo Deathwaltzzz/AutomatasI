@@ -35,9 +35,8 @@ public class AppMain {
                 };
                 switch(opc){
                     case 1 -> capturarDatos(fields);
-                    case 2->{
+                    case 2->
                         mostrarDatosLeidos();
-                    }
                 }
             }
         }while(opc != 3);
@@ -51,9 +50,7 @@ public class AppMain {
             while(sc.hasNextLine()){
                 lineas++;
                 sc.nextLine();
-                System.out.println("a");
             }
-            System.out.println(lineas);
             if(lineas == 0) {
                 writer = new FileWriter(salida);
                 writer.write("|     NOMBRE      |       APELLIDO PATERNO         |     APELLIDO MATERNO         |          EDAD       |");

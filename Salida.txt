@@ -1,4 +1,3 @@
 |     NOMBRE      |       APELLIDO PATERNO         |     APELLIDO MATERNO         |          EDAD       |
 | Leonardo | Contreras | Martinez | 20 |
-| Leonardo | Contreras | Martinez | 20 |
 | Guillermo Daniel | Ortiez | Aguilar | 22 |

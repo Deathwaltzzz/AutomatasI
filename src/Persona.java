@@ -46,6 +46,8 @@ public class Persona {
         this.edad = edad;
     }
 
-
+    public String[] returnArray(){
+        return new String[]{this.nombre,this.apPaterno,this.apMaterno,String.valueOf(this.edad)};
+    }
 
 }

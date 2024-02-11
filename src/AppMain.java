@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,7 +86,10 @@ public class AppMain {
 /*Metodo que muestra con una JTable los datos almacenados en el archivo*/
     public static void mostrarDatosLeidos() {
         Object[] cols = {"Nombre", "Apellido Paterno", "Apellido Materno", "Edad"};
-        if(!salida.exists()) return;
+        if(!salida.exists()){
+            JOptionPane.showMessageDialog(null,"El archivo no existe!, reinicie el programa");
+            return;
+        }
         int amount = existingData.size();
         Object[][] rows = new Object[amount][4];
         for (int i = 0; i < amount; i++)

@@ -1,3 +1,5 @@
+package U1;
+
 import javax.swing.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -5,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class AppMain {
+public class Practica1 {
     static JTextField nombre = new JTextField("Nombre");
     static JTextField apPaterno = new JTextField("Apellido Paterno");
     static JTextField apMaterno = new JTextField("Apellido Materno");
@@ -76,7 +78,7 @@ public class AppMain {
         Persona persona = new Persona(nombre.getText(), apPaterno.getText(), apMaterno.getText(), Integer.parseInt(edad.getText()));
         escribirArchivo(persona);
     }
-/*Metodo para escrbir en el archivo, recibe como parametro el objeto Persona y lo escribe en el archivo*/
+/*Metodo para escrbir en el archivo, recibe como parametro el objeto U1.Persona y lo escribe en el archivo*/
     public static void escribirArchivo(Persona persona) throws IOException {
         FileWriter writer = new FileWriter(salida,true);
         writer.append(String.format("\n| %s | %s | %s | %d |",persona.getNombre(),persona.getApPaterno(),persona.getApMaterno(),persona.getEdad()));

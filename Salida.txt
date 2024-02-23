@@ -3,3 +3,6 @@
 | Guillermo Daniel | Ortiez | Aguilar | 22 |
 | Leonardo | Contreras | Martinez | 20 |
 | John | Gil | Herrera | 21 |
+| Brandon | Castillo | Martinez | 21 |
+| Kieran Ismael | Lopez | Valadez | 20 |
+| Josue | Hernandez | Lopez | 25 |

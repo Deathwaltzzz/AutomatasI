@@ -1,4 +1,4 @@
-package U1;
+package U2;
 
 import javax.swing.*;
 import java.io.File;
@@ -43,12 +43,18 @@ public class Practica2 {
                     break;
             }
             if(evaluador != null && opcion != 4) {
-                JOptionPane.showMessageDialog(null, String.format("Numero de coincidencias: \n%d " +
-                        "\nCaracteres que coincidieron: \n%s",
+                JOptionPane.showMessageDialog(null, String.format("""
+                                Numero de coincidencias:\s
+                                %d\s
+                                Caracteres que coincidieron:\s
+                                %s""",
                         evaluador.returnCoincidencias().length, Arrays.toString(evaluador.returnCoincidencias()))
                 );
-                JOptionPane.showMessageDialog(null, String.format("Numero de NO coincidencias: \n%d " +
-                                "\nCaracteres que NO coincidieron: \n%s",
+                JOptionPane.showMessageDialog(null, String.format("""
+                                Numero de NO coincidencias:\s
+                                %d\s
+                                Caracteres que NO coincidieron:\s
+                                %s""",
                         evaluador.returnNoCoincidencias().length, Arrays.toString(evaluador.returnNoCoincidencias()))
                 );
             }

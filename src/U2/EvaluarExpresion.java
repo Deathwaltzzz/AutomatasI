@@ -17,10 +17,10 @@ public class EvaluarExpresion {
                 for (String cadena : cadenas) analizarLenguaje1(cadena);
             }
             case 2 -> {
-                for (String cadena : cadenas) exReg_pattern(cadena);
+                for (String cadena : cadenas) lenguaje2(cadena);
             }
             case 3 -> {
-                for (String cadena : cadenas) lenguaje2(cadena);
+                for (String cadena : cadenas) exReg_pattern(cadena);
             }
         }
         System.out.println("Coincide: " + coinciden.toString());
@@ -40,16 +40,17 @@ public class EvaluarExpresion {
         for (int i = 0; i < cadena.length(); i++) {
             char currChar = cadena.charAt(i);
             aux = i;
-            while (esVocal(currChar) && !togVocal) { //Este metodo se activa una vez que se detecte una vocal, terminara su ejecucion cuando ya no existan mas vocales.
-                if (cadena.charAt(i+1) == 'b' || aux == cadena.length() - 2) { //Una vez que se analize todas las vocales se comprueba si la siguiente letra es 'b', si es asi se continuara con la evaluiacion.
+            while (esVocal(cadena.charAt(aux)) && !togVocal) { //Este metodo se activa una vez que se detecte una vocal, terminara su ejecucion cuando ya no existan mas vocales.
+                if (cadena.charAt(aux+1) == 'b' || aux == cadena.length() - 2) { //Una vez que se analize todas las vocales se comprueba si la siguiente letra es 'b', si es asi se continuara con la evaluiacion.
                     togVocal = true;
-                    currChar = cadena.charAt(i+1);
+                    currChar = cadena.charAt(aux+1);
                     i = aux + 1;
                     break;
                 }
                 aux++;
             }
-            if (!togVocal) continue; //Valida que exista aunque sea una vocal dentro de la cadena
+            if (!togVocal) break; //Valida que exista aunque sea una vocal dentro de la cadena
+            if(!(esNumerico(currChar) || esUnaLetra(currChar))) break;
             if (currChar != 'b' && !togConst)
                 break; //Si el caracter actual no es b y no se ha toggleado el boolean de es constante se crasheara el ciclo
             if (togConst && currChar == 'b' || togConst && esUnaLetra(currChar))
@@ -87,43 +88,17 @@ public class EvaluarExpresion {
             return;
         }
         for(int i = 0 ; i < cadena.length() ; i++) {
-        /*contador++;// aumenta el contador
-        while (contador < tamaño) // verificar si el contador es menor al tamaño de la cadena
-        {*/
             char caracter = cadena.charAt(i);// se extrae el caracter con la posicion del caracter
             if(!(esNumerico(caracter) || esUnaLetra(caracter))) break;
             if(esUnaLetra(caracter) && !imparEncontrado) continue;
             if(esUnaLetra(caracter) && imparEncontrado) break;
-            /*En vez de utilizar un contador, utilizo booleanos para checar si es una letra y no se ha detectado un numero impoar que siga con el programa. Si no que termine
-            * Es basicamente lo mismo pero mas simplificado.*/
-
-            /*if (caracter >= 97 && caracter <= 122) // si ese caracter es una letra minuscula
-            {
-                // ================================
-                System.out.println(contador);    // 1  //Comentario de Leo:
-                // ================================      Siento que es algo redundante checar si existe algo entre a y ( 1 | 3 | 5 | 7 | 9)
-                contador++;                              Si algo se tendria que verificar primero si hay un caracter no perteneciente o un numero par
-
-            } else */
-            //if(esNumerico(caracter))   // es numerico? Comentario Leo: En vez de checar si es numerico y ejecutar, mejor checa si no es numerico, checar de una si no es par, mas facil y optimizado
-            //int numero = Character.getNumericValue(caracter);// trae el valor numerico del caracter, no el ascii
-            //if (caracter == 1 || caracter == 3 || caracter == 5 || caracter == 7 || caracter == 9) // ese numero es impar? Comentario Leo: Lo mismo aqui, en vez de checar si si es, checar si no es, si no es un numero impar truena el programa.
-            if (!esImpar(caracter)) break;//Comentario Leo: Es mas facil hacer una division entre 2, si es 1 eso significa que es impar
-               /* if (caracter == Character.getNumericValue(cadena.charAt(contador))) //si ese numero es igual al otro. Comentario Leo:
-                    noCoincide.add(cadena);// se agrega alas cadenas que no coinciden                                       Segun yo las cadenas dentro de un (1 | 3 | 4...) se pueden repetir.
-                    break;
-                }*/
-            /*Nota de Leo:
-            * En esta parte del codigo, es mejor ir checando condicion por condicion, si se cumple sigue ejecutandote hasta llegar a lo que queremos
-            * Si no. rompe el ciclo y agregalo a lo que no pertenece. El problema con la implementacion original era que no tenia bien establecido
-            * los puntos de control del programa*/
+            if (!esImpar(caracter)) break;
             imparEncontrado = true;
             if( i < cadena.length() - 1 && esImpar(caracter) && esNumerico(cadena.charAt(i+1))) continue;
             if(cadena.length()-1 == i) coincide = true;
         }
         if(coincide) coinciden.add(cadena);
         else noCoincide.add(cadena);
-        //} //se termina el while
     }
 
     public boolean esImpar(char num){
@@ -131,11 +106,11 @@ public class EvaluarExpresion {
     }
 
     public void exReg_pattern(String cadena) {
-        String ER2 = "a[a-z0-9]*(1|3|5|7|9)+";
-        Pattern compilador = Pattern.compile(ER2);
-        Matcher comparador = compilador.matcher(cadena);
+        String expReg = "^(ab|xy)+&\\d*";
+        Pattern pattern = Pattern.compile(expReg);
+        Matcher matcher = pattern.matcher(cadena);
         //MUESTRA SI LA EXPRESION SI PERTENECE O NO A LA ER
-        if (comparador.matches()) {
+        if (matcher.find()) {
             coinciden.add(cadena);
         } else {
             noCoincide.add(cadena);

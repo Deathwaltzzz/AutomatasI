@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Practica2 {
+    private
     static File file = new File("Escrito.txt");
     public static void main(String[] args) throws IOException {
         int opciones, opcion =0;

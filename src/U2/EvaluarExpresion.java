@@ -40,16 +40,17 @@ public class EvaluarExpresion {
         for (int i = 0; i < cadena.length(); i++) {
             char currChar = cadena.charAt(i);
             aux = i;
-            while (esVocal(currChar) && !togVocal) { //Este metodo se activa una vez que se detecte una vocal, terminara su ejecucion cuando ya no existan mas vocales.
-                if (cadena.charAt(i+1) == 'b' || aux == cadena.length() - 2) { //Una vez que se analize todas las vocales se comprueba si la siguiente letra es 'b', si es asi se continuara con la evaluiacion.
+            while (esVocal(cadena.charAt(aux)) && !togVocal) { //Este metodo se activa una vez que se detecte una vocal, terminara su ejecucion cuando ya no existan mas vocales.
+                if (cadena.charAt(aux+1) == 'b' || aux == cadena.length() - 2) { //Una vez que se analize todas las vocales se comprueba si la siguiente letra es 'b', si es asi se continuara con la evaluiacion.
                     togVocal = true;
-                    currChar = cadena.charAt(i+1);
+                    currChar = cadena.charAt(aux+1);
                     i = aux + 1;
                     break;
                 }
                 aux++;
             }
-            if (!togVocal) continue; //Valida que exista aunque sea una vocal dentro de la cadena
+            if (!togVocal) break; //Valida que exista aunque sea una vocal dentro de la cadena
+            if(!(esNumerico(currChar) || esUnaLetra(currChar))) break;
             if (currChar != 'b' && !togConst)
                 break; //Si el caracter actual no es b y no se ha toggleado el boolean de es constante se crasheara el ciclo
             if (togConst && currChar == 'b' || togConst && esUnaLetra(currChar))
@@ -105,11 +106,11 @@ public class EvaluarExpresion {
     }
 
     public void exReg_pattern(String cadena) {
-        String ER2 = "a[a-z0-9]*(1|3|5|7|9)+";
-        Pattern compilador = Pattern.compile(ER2);
-        Matcher comparador = compilador.matcher(cadena);
+        String expReg = "^(ab|xy)+&\\d*";
+        Pattern pattern = Pattern.compile(expReg);
+        Matcher matcher = pattern.matcher(cadena);
         //MUESTRA SI LA EXPRESION SI PERTENECE O NO A LA ER
-        if (comparador.matches()) {
+        if (matcher.find()) {
             coinciden.add(cadena);
         } else {
             noCoincide.add(cadena);

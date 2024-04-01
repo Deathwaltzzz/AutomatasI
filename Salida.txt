@@ -1,8 +1,13 @@
-|     NOMBRE      |       APELLIDO PATERNO         |     APELLIDO MATERNO         |          EDAD       |
-| Leonardo | Contreras | Martinez | 20 |
-| Guillermo Daniel | Ortiez | Aguilar | 22 |
-| Leonardo | Contreras | Martinez | 20 |
-| John | Gil | Herrera | 21 |
-| Brandon | Castillo | Martinez | 21 |
-| Kieran Ismael | Lopez | Valadez | 20 |
-| Josue | Hernandez | Lopez | 25 |
+"stringvalido",-63,-2,1
+int,-11,-2,1
+x&,-51,-1,1
+//hola esto es un comentario valido//,-56,-2,3
+//hola//,-56,-2,3
+int,-11,-2,4
+hola#,-53,-1,4
+numero#,-53,-1,4
+real%,-52,-1,4
+h123_12#,-53,-1,5
+program,-1,-2,5
+begin,-2,-2,5
+end,-3,-2,5

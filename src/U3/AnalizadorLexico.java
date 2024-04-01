@@ -79,6 +79,7 @@ public class AnalizadorLexico {
         return false;
     }
 
+    //Metodo para crear nuevo archivo, recibe como parametro el nombre del archivo
     public void crearArchivo(String name){
         File archivo = new File(name);
         try{
@@ -87,7 +88,8 @@ public class AnalizadorLexico {
             System.out.println(e.getMessage());
         }
     }
-
+    /*Metodo para categorizar las cadenas que llegan y escribirlas en el archivo
+    * de texto como salida.*/
     public void categorizar(String cadena, int linea){
         //Primero se separa por los que coincidan con el patron de los comentarios
         Pattern pattern = Pattern.compile("//.*?//");
@@ -97,28 +99,30 @@ public class AnalizadorLexico {
             cadena = cadena.replace(matcher.group(), "");
         }
         cadena = cadena.replaceAll("//.*","");
-
+        //Se separa por "," esto es temporal ya que no me corresponde a mi hacer esto xd
         String[] cadenas = splitComma(cadena);
         pattern = Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*[#%&$?]"); //Identificadores
+        //De las cadenas que regresen del split se analizan para determinar a que pertenece
         for(String cad : cadenas){
-            System.out.println(cad);
-            if(pattern.matcher(cad).matches()){
+            if(pattern.matcher(cad).matches()){ //Identificadores
                 System.out.println("Identificador: "+cad);
                 if(ids.containsKey(cad.charAt(cad.length()-1)))
                     writeToFile(cad,ids.get(cad.charAt(cad.length()-1)),linea);
                 continue;
             }
-            if(reservadas.containsKey(cad)){
+            if(reservadas.containsKey(cad)){ //Palabras reservadas
                 writeToFile(cad,reservadas.get(cad),linea);
                 continue;
             }
-            if(cad.charAt(0) == '"' && cad.charAt(cad.length()-1) == '"' && cad.length() > 2)
+            if(cad.charAt(0) == '"' && cad.charAt(cad.length()-1) == '"' && cad.length() > 2) //Cadenas
                 writeToFile(cad,-63,linea);
         }
     }
 
     /*Este metodo simplemente actua como un .split() pero especificamente para separar por , que es el dilimitador
-     * del lenguaje de prueba, este metodo no es final ya que no me corresponde, pero lo estoy utilizando para pruebas*/
+     * del lenguaje de prueba, este metodo no es final ya que no me corresponde, pero lo estoy utilizando para pruebas.
+     * Pude usar un regex de una sola linea pero que aburrido no?
+     * Tambien separa los que pertenezcan a un string, nuevamente lo pude hacer con un regex pero fuck it, we ball*/
     public String[] splitComma(String cadena){
         ArrayList<String> list = new ArrayList<String>();
         String current = "";
@@ -149,6 +153,8 @@ public class AnalizadorLexico {
         return list.toArray(new String[0]);
     }
 
+    /*Este metodo escribe a el archivo ARCHIVO_SALIDA(salida.txt) la cadena que le llegue, su token,
+    * -2 o -1 y la linea a la que pertenecen*/
     public void writeToFile(String cadena, int token, int linea){
         int id = -2;
         if(token == -51 || token == -52 || token == -53 || token == -54 || token == -55) id = -1;

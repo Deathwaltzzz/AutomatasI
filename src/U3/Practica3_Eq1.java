@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
@@ -22,91 +21,101 @@ public class Practica3_Eq1 {
     public static String[] opRelacionales = {">", "<", "==", ">=", "<=", "!="};
     public static String[] opLogicos = {"and", "or", "not"};
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
+		try {
+			if (leerArchivo() == null) {
+				JOptionPane.showMessageDialog(null,
+						"El archivo \"Escrito.txt\" no existe o esta vacio! favor de comprobarlo");
+				file.createNewFile();
+				System.exit(1);
+			}
 
-        if (leerArchivo() == null) {
-            JOptionPane.showMessageDialog(null,
-                    "El archivo \"Escrito2.txt\" no existe o esta vacio! favor de comprobarlo");
-            file.createNewFile();
-            System.exit(1);
-        }
+			String[] texto = leerArchivo();
 
-        String[] texto = leerArchivo();
+			if (texto != null) {
 
-        if (texto != null) {
+				ArrayList<Componente> cadenasValidas = new ArrayList<>();
+				int opciones, opcion = 0;
+				String menu = "\nMenú \n";
+				menu += "Elige una opción para ver las cadenas válidas y no válidas para cada expresión \n";
+				menu += "1. Leer archivo  y Clasificar cadenas\n";
+				menu += "2. Escribir en archivo Clasificacion.txt\n";
+				menu += "3. Salir  \n";
+				opciones = 3;
 
-            ArrayList<Componente> cadenasValidas = new ArrayList<>();
-            int opciones, opcion = 0;
-            String menu = "\nMenú \n";
-            menu += "Elige una opción para ver las cadenas válidas y no válidas para cada expresión \n";
-            menu += "1. Leer archivo  y Clasificar cadenas\n";
-            menu += "2. Escribir en archivo Clasificacion.txt\n";
-            menu += "3. Salir  \n";
-            opciones = 3;
+				do {
+					opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
 
-            do {
-                opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
+					switch (opcion) {
+					case 1:
+						String clasificacion = null, clasificacion2 = null, clasificacion3 = null;
+						// identififcadores en java
+						Componente comp = null;
+						for (int a = 0; a < texto.length; a++) {
+							clasificacion = identificadorJava(texto[a]);
+							comp = new Componente(texto[a], clasificacion);
+							if (clasificacion != null) {
+								cadenasValidas.add(comp);
+							}
 
-                switch (opcion) {
-                    case 1:
-                        String clasificacion = null, clasificacion2 = null, clasificacion3 = null;
-                        //identififcadores en java
-                        Componente comp = null;
-                        for (int a = 0; a < texto.length; a++) {
-                            clasificacion = identificadorJava(texto[a]);
-                            comp = new Componente(texto[a], clasificacion);
-                            if (clasificacion != null) {
-                                cadenasValidas.add(comp);
-                            }
+						}
+						// NUMEROS EN LENGUAJE C
+						comp = null;
+						for (int a = 0; a < texto.length; a++) {
 
-                        }
-                        // NUMEROS EN LENGUAJE C
-                        comp = null;
-                        for (int a = 0; a < texto.length; a++) {
+							clasificacion2 = numerosC(texto[a]);
+							// clasificacion2 = "es un numero entero ";
+							comp = new Componente(texto[a], clasificacion2);
+							if (clasificacion2 != null) {
+								cadenasValidas.add(comp);
+							}
 
-                            clasificacion2 = numerosC(texto[a]);
-                            // clasificacion2 = "es un numero entero ";
-                            comp = new Componente(texto[a], clasificacion2);
-                            if (clasificacion2 != null) {
-                                cadenasValidas.add(comp);
-                            }
+						}
+						// operadores phyron
+						comp = null;
+						for (int a = 0; a < texto.length; a++) {
+							String x = "";
+							if (texto[a].contains("or"))
+								x = "or";
+							else if (texto[a].contains("and"))
+								x = "and";
+							else if (texto[a].contains("not"))
+								x = "not";
+							if (x.isEmpty()) {
+								Pattern pattern = Pattern.compile("[0-9a-zA-Z]");
+								x = pattern.matcher(texto[a]).replaceAll("");
+							}
+							clasificacion3 = operadoresPhyton(texto[a]);
+							if (clasificacion3 != null) {
+								comp = new Componente(x, clasificacion3);
+								cadenasValidas.add(comp);
+							}
+						}
+						break;
+					case 2:
+						escribirEnArchivo("Clasificacion.txt", cadenasValidas);
+						break;
+					case 3:
+						JOptionPane.showMessageDialog(null, "Fin del programa");
+						break;
+					default:
+						JOptionPane.showMessageDialog(null, "Opción no válida. Inténtelo de nuevo.");
+					}
 
-                        }
-                        //operadores phyron
-                        comp = null;
-                        for (int a = 0; a < texto.length; a++) {
-                            String x = "";
-                            if (texto[a].contains("or")) x = "or";
-                            else if (texto[a].contains("and")) x = "and";
-                            else if (texto[a].contains("not")) x = "not";
-                            if(x.isEmpty()){
-                                Pattern pattern = Pattern.compile("[0-9a-zA-Z]");
-                                x = pattern.matcher(texto[a]).replaceAll("");
-                            }
-                            clasificacion3 = operadoresPhyton(texto[a]);
-                            if (clasificacion3 != null) {
-                                comp = new Componente(x, clasificacion3);
-                                cadenasValidas.add(comp);
-                            }
-                        }
-                        break;
-                    case 2:
-                        escribirEnArchivo("Clasificacion.txt", cadenasValidas);
-                        break;
-                    case 3:
-                        JOptionPane.showMessageDialog(null, "Fin del programa");
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(null, "Opción no válida. Inténtelo de nuevo.");
-                }
+				} while (opcion != opciones);
 
-            } while (opcion != opciones);
-
-        } else {
-            JOptionPane.showMessageDialog(null,
-                    "El archivo \"Escrito.txt\" no existe o está vacío. Favor de comprobarlo");
-        }
-    }
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"El archivo \"Escrito.txt\" no existe o está vacío. Favor de comprobarlo");
+			}
+		} catch (IOException e) {
+			System.out.println("Error general de E/S: " + e.getMessage());
+		} catch (NumberFormatException e) {
+			System.out.println("Error de formato numérico: " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("Error no especificado: " + e.getMessage());
+		}
+	}//Fin de metodo main
 
     public static String[] leerArchivo() {
         try (Scanner sc = new Scanner(file)) {
@@ -129,7 +138,7 @@ public class Practica3_Eq1 {
             for (Componente componente : contenido) {
                 writer.write(componente.toString());
             }
-            System.out.println("Contenido escrito en el archivo correctamente.");
+            JOptionPane.showMessageDialog(null,"Contenido escrito en el archivo correctamente.");
         } catch (IOException e) {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
@@ -140,54 +149,56 @@ public class Practica3_Eq1 {
         System.exit(1);
     }
 
-    /*
-     * LOS POSIBLES ESTADOS DENTRO DE MI CASO SON:
-     * -----------------------------------------------------
-     * | S     | $     |  _    |   a-z   |  A-Z   |   0-9  |
-     * -----------------------------------------------------
-     * | q0    |  q1   |  q4   |   q2    | q2     |   q5   |
-     * -----------------------------------------------------
-     * | q1    |   q1  |  q1   |     q2  |  q2    |  q3    |
-     * -----------------------------------------------------
-     * | q2    |    q1 | q1    |   q2    |   q2   |  q3    |
-     * -----------------------------------------------------
-     * | q3    |   q1  |    q1 |  q2     |   q2   | q3     |
-     * -----------------------------------------------------
-     * | q4    |    q1 |  q1   |   q2    |  q2    |  q3    |
-     * -----------------------------------------------------
-     * | q5    |    q5 |  q5   |   q5    |  q5    |   q5   |
-     * -----------------------------------------------------
-     */
-    public static String identificadorJava(String cadena) {
-        char currChar = cadena.charAt(0);
-        boolean pertenece = false;
-        boolean letraEncontrada = false;
-        HashMap<Character, String> estados = new HashMap<>();
-        for (int i = 0; i < cadena.length(); i++) {
-            currChar = cadena.charAt(i);
-            if (i == 0 && currChar == '_' && cadena.length() == 1) {
-                estados.put(currChar, "q4");
-                return null;
-            }
-            if (i == 0 && isNumeric(currChar)) {
-                estados.put(currChar, "q5");
-                return null;
-            }
-            if (!(isLower(currChar) || isUpper(currChar) || isSpecial(currChar) || isNumeric(currChar))) {
-                estados.put(currChar, "q5");
-                return null;
-            }
-            if (isLower(currChar) || isUpper(currChar)) estados.put(currChar, "q2");
-            if (isNumeric(currChar)) estados.put(currChar, "q3");
-            if (isSpecial(currChar)) estados.put(currChar, "q1");
+/**
+ * This method is used to validate if a given string is a valid identifier in Java.
+ * An identifier in Java can be a class name, method name, variable name, etc.
+ * The method follows the following rules to validate a Java identifier:
+ * 1. A valid identifier in Java can start with a letter (uppercase or lowercase), an underscore (_) or a dollar sign ($).
+ * 2. The following characters can be letters, digits, dollar signs or underscore characters.
+ * 3. It cannot start with a digit.
+ * 4. It cannot be equal to a Java keyword.
+ * <p>
+ * The method uses a HashMap to store the state of each character in the string. The states are represented as "q1", "q2", "q3", "q4" and "q5".
+ * Each state represents a specific rule of the identifiers in Java.
+ * - "q1": The character is a dollar sign ($) or an underscore character (_).
+ * - "q2": The character is a letter (uppercase or lowercase).
+ * - "q3": The character is a digit.
+ * - "q4": The character is an underscore and it is the only character in the string.
+ * - "q5": The character is not valid for a Java identifier.
+ * <p>
+ * The method goes through each character of the string and checks its state. If the state of the last character is "q1", "q2" or "q3",
+ * the string is a valid Java identifier and the method returns "Identificador valido de Java". Otherwise, it returns null.
+ *
+ * @param cadena The string to be validated.
+ * @return A string indicating if the input is a valid Java identifier or null if it is not.
+ */
+public static String identificadorJava(String cadena) {
+    char currChar = cadena.charAt(0);
+    HashMap<Character, String> estados = new HashMap<>();
+    for (int i = 0; i < cadena.length(); i++) {
+        currChar = cadena.charAt(i);
+        if (i == 0 && currChar == '_' && cadena.length() == 1) {
+            estados.put(currChar, "q4");
+            return null;
         }
-        System.out.println(cadena);
-        String lastSt = estados.get(cadena.charAt(cadena.length() - 1));
-        String[] estadosValidos = {"q1", "q2", "q3"};
-        List<String> valido = Arrays.asList(estadosValidos);
-        if (valido.contains(lastSt)) return "Identificador valido de Java";
-        return null;
+        if (i == 0 && isNumeric(currChar)) {
+            estados.put(currChar, "q5");
+            return null;
+        }
+        if (!(isLower(currChar) || isUpper(currChar) || isSpecial(currChar) || isNumeric(currChar))) {
+            estados.put(currChar, "q5");
+            return null;
+        }
+        if (isLower(currChar) || isUpper(currChar)) estados.put(currChar, "q2");
+        if (isNumeric(currChar)) estados.put(currChar, "q3");
+        if (isSpecial(currChar)) estados.put(currChar, "q1");
     }
+    String lastSt = estados.get(cadena.charAt(cadena.length() - 1));
+    String[] estadosValidos = {"q1", "q2", "q3"};
+    List<String> valido = Arrays.asList(estadosValidos);
+    if (valido.contains(lastSt)) return "Identificador valido de Java";
+    return null;
+}
 
     // Metodo que dice si es un caracter minuscula
     public static boolean isLower(char c) {
@@ -212,8 +223,6 @@ public class Practica3_Eq1 {
     // NUMEROS REALES Y ENTEROS EN LENGUAJE C - LA PARTE DE ADRIAN
     public static String numerosC(String cadena) {
         String clasificacion = "";
-
-        double x = 10E4;
 
         if (cadena.isEmpty()) {
             return clasificacion = "Cadena vacía";
@@ -251,8 +260,6 @@ public class Practica3_Eq1 {
     private static boolean numeroRealC(String cadena) {
         boolean puntoEncontrado = false;
         boolean guionEncontrado = false;
-
-        float x = 10.5f;
 
         for (char c : cadena.toCharArray()) {
             if (c == '-' && !guionEncontrado) {
@@ -321,5 +328,4 @@ public class Practica3_Eq1 {
         }
         return clasificacion;
     }
-
-}
+}//fin de la clase

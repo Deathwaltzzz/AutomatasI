@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Practica2 {
+    private
     static File file = new File("Escrito.txt");
     public static void main(String[] args) throws IOException {
         int opciones, opcion =0;
@@ -22,7 +23,7 @@ public class Practica2 {
         String menu = "\nMenú \n";
         menu += "Eliga una opción para ver las cadenas validas y no validas para cada expresión \n";
         menu += "1.  ER =(a|e|i|o|u)+b_(09)*  \n";
-        menu += "2.  ER = a[a-z0-9]*(1|3|5|7|9)+\n";
+        menu += "2.  ER = a[a-z]*(1|3|5|7|9)+\n";
         menu += "3.  ER = (ab|xy)+&(0-9)*  \n";
         menu += "4.  Salir  \n";
         opciones = 4;
@@ -30,26 +31,31 @@ public class Practica2 {
         String regex = null;
 
         do {
-            opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
-            switch (opcion) {
-                case 1:
-                    evaluador = new EvaluarExpresion(texto,1);
-                    regex = "(a | e | i | o | u)+ b (0-9)*";
-                    break;
-                case 2:
-                    evaluador = new EvaluarExpresion(texto,2);
-                    regex = "a[a-z0-9]*(1|3|5|7|9)";
-                    break;
-                case 3:
-                    evaluador = new EvaluarExpresion(texto,3);
-                    regex = "(ab|xy)+&(0-9)*";
-                    break;
-                case 4:
-                    JOptionPane.showMessageDialog(null, "Fin del programa");
-                    break;
+            try{
+                opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
+                switch (opcion) {
+                    case 1:
+                        evaluador = new EvaluarExpresion(texto,1);
+                        regex = "(a | e | i | o | u)+ b (0-9)*";
+                        break;
+                    case 2:
+                        evaluador = new EvaluarExpresion(texto,2);
+                        regex = "a[a-z]*(1|3|5|7|9)";
+                        break;
+                    case 3:
+                        evaluador = new EvaluarExpresion(texto,3);
+                        regex = "(ab|xy)+&(0-9)*";
+                        break;
+                    case 4:
+                        JOptionPane.showMessageDialog(null, "Fin del programa");
+                        break;
+                }
+                if(evaluador != null && opcion != 4)
+                    mostrarResultados(evaluador.returnCoincidencias(), evaluador.returnNoCoincidencias(),regex);
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Opcion invalida");
             }
-            if(evaluador != null && opcion != 4)
-                mostrarResultados(evaluador.returnCoincidencias(), evaluador.returnNoCoincidencias(),regex);
+
         } while (opcion != opciones);
     }
 
@@ -89,6 +95,8 @@ public class Practica2 {
         JPanel container = new JPanel();
         container.setLayout(new BorderLayout());
         container.add(label, BorderLayout.PAGE_START); // Place label at the top
+        table.setFont(new Font("Comic Sans MS",Font.PLAIN,14));
+        container.setFont(new Font("Comic Sans MS",Font.PLAIN,14));
         container.add(table, BorderLayout.CENTER);
         JScrollPane pane = new JScrollPane(container);
         pane.setColumnHeaderView(table.getTableHeader());

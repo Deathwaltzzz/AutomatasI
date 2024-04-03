@@ -1,0 +1,4 @@
+"Esto es un string", int x#, real y&
+string, bool while then do
+// Comentario valido // //Comentario no valido
+//Comentario// seguido# hola% program begin end

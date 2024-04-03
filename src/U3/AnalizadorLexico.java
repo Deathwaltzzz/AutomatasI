@@ -99,6 +99,7 @@ public class AnalizadorLexico {
             cadena = cadena.replace(matcher.group(), "");
         }
         cadena = cadena.replaceAll("//.*","");
+        if(cadena.isEmpty() || cadena.isBlank()) return;
         //Se separa por "," esto es temporal ya que no me corresponde a mi hacer esto xd
         String[] cadenas = splitComma(cadena);
         pattern = Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*[#%&$?]"); //Identificadores

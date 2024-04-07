@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 public class AnalizadorLexico {
     public final String ARCHIVO_SALIDA = "salida.txt";
-    public HashMap<Character, Integer> ids = new HashMap<Character, Integer>();
-    public HashMap<String, Integer> reservadas = new HashMap<String, Integer>();
+    public HashMap<Character, Integer> ids = new HashMap<>();
+    public HashMap<String, Integer> reservadas = new HashMap<>();
     public Pattern pattern;
     public Matcher matcher;
 
@@ -106,7 +106,7 @@ public class AnalizadorLexico {
     }
 
     public String separarInts(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("\\d+");
+        Pattern pattern = Pattern.compile("\\b\\d+\\b");
         Matcher matcher = pattern.matcher(cadena);
         while (matcher.find()) {
             writeToFile(matcher.group(), -61, linea);
@@ -154,8 +154,10 @@ public class AnalizadorLexico {
                 writeToFile(cad, reservadas.get(cad), linea);
                 continue;
             }
-            cad = separarInts(cad, linea);
-            cad = separarReales(cad, linea);
+            if(numerosEnteros(cad))
+                cad = separarInts(cad, linea);
+            if(numeroReal(cad))
+                cad = separarReales(cad, linea);
             valorBool(cad, linea);
         }
     }
@@ -244,6 +246,21 @@ public class AnalizadorLexico {
             }
         }
     }
+
+    // Expresión regular para números enteros (uno o más dígitos, no incluye
+    // negativos
+    public boolean numerosEnteros(String cadena) {
+        String patronEntero = "^\\d+$";
+        return Pattern.matches(patronEntero, cadena);
+    }
+
+    // Expresión regular para números decimales (uno o más dígitos seguidos de punto
+    // y uno o más dígitos
+    public boolean numeroReal(String cadena) {
+        String patronDecimal = "^-?\\d+\\.\\d+$";
+        return Pattern.matches(patronDecimal, cadena);
+    }
+
 
     public void caracteresespeciales(String cadena, int linea) {
         int tamaño = cadena.length();

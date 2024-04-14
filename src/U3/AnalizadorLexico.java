@@ -12,6 +12,10 @@ public class AnalizadorLexico {
     public final String ARCHIVO_SALIDA = "salida.txt";
     public HashMap<Character, Integer> ids = new HashMap<>();
     public HashMap<String, Integer> reservadas = new HashMap<>();
+    public HashMap<String, Integer> opAritmeticos = new HashMap<>();
+    public HashMap<String, Integer> opRelacionales = new HashMap<>();
+    public HashMap<String, Integer> opLogicos = new HashMap<>();
+    public HashMap<String, Integer> carEspecial = new HashMap<>();
     public Pattern pattern;
     public Matcher matcher;
 
@@ -20,6 +24,14 @@ public class AnalizadorLexico {
         inicializarIdentificadores();
         // Declaracion de las palabras reservadas
         inicializarPalabrasReservadas();
+        // Declaracion de los operadores aritmeticos
+        inicializarOperadoresAritmeticos();
+        // Declaracion de los operadores relacionales
+        inicializarOperadoresRelacionales();
+        // Declaracion de los operadores logicos
+        inicializarOperadoresLogicos();
+        // Declaracion de los caracteres especiales
+        inicializarCaracteresEspeciales();
         // Clear file
         try (FileWriter fw = new FileWriter(ARCHIVO_SALIDA)) {
             fw.write("");
@@ -58,6 +70,39 @@ public class AnalizadorLexico {
         reservadas.put("do", -17);
     }
 
+    public void inicializarOperadoresAritmeticos() {
+        opAritmeticos.clear();
+        opAritmeticos.put("+", -24);
+        opAritmeticos.put("-", -25);
+        opAritmeticos.put("*", -21);
+        opAritmeticos.put("/", -22);
+        opAritmeticos.put(":=", -26);
+    }
+    public void inicializarOperadoresRelacionales() {
+        opRelacionales.clear();
+        opRelacionales.put("<", -31);
+        opRelacionales.put(">", -33);
+        opRelacionales.put("<=", -32);
+        opRelacionales.put(">=", -34);
+        opRelacionales.put("==", -35);
+        opRelacionales.put("!=", -36);
+    }
+    public void inicializarOperadoresLogicos() {
+        opLogicos.clear();
+        opLogicos.put("&&", -41);
+        opLogicos.put("||", -42);
+        opLogicos.put("!", -43);
+    }
+
+    public void inicializarCaracteresEspeciales() {
+        carEspecial.clear();
+        carEspecial.put("(", -73);
+        carEspecial.put(")", -74);
+        carEspecial.put(";", -75);
+        carEspecial.put(",", -76);
+        carEspecial.put(":", -77);
+    }
+
     public void leerArchivo(File archivo) {
         if (!archivo.exists()) {
             System.out.println("El archivo no existe, se creara a continuacion");
@@ -69,8 +114,7 @@ public class AnalizadorLexico {
             Scanner sc = new Scanner(archivo);
             while (sc.hasNextLine()) {
                 String linea = sc.nextLine();
-                System.out.println("Linea: " + linea);
-                categorizar(linea, ++i);
+                categorizar(linea.trim(), ++i);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -89,11 +133,10 @@ public class AnalizadorLexico {
 
     public String[] fragmentar(String linea) {
         /*Ni Dios sabe como hice esta REGEX, pero de alguna forma funciona para TODOS Los casos (en teoria)*/
-        pattern = Pattern.compile("\".*?\"|/{2}.*/{2}|:=|<=|>=|==|!=|\\|{2}|&&|\\d+\\.\\d*|\\b[a-zA-Z\\d]+\\b[#%&$?]*|[-+*;,><:=()!]|\\b[();,:]+\\s*^\".*\"$");
+        pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|\\||&&|-?\\d+\\.\\d*|[-+*;,<>():]|\\d+!|\\b[a-zA-Z\\d_]+\\b[#%&$?]*|\\.[^ \\t\\n\\r\\f\\v]+");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();
-
         // Agregar los fragmentos obtenidos al ArrayList
         while (matcher.find()) {
             String fragmento = matcher.group().trim(); // Eliminamos espacios en blanco al inicio y al final
@@ -103,24 +146,12 @@ public class AnalizadorLexico {
         return fragmentos.toArray(new String[0]);
     }
 
-    public String separarInts(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("-?\\b\\d+\\b");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -61, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
+    public void separarInts(String cadena, int linea) {
+        writeToFile(cadena, -62, linea);
     }
 
-    public String separarReales(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("-?\\d+\\.\\d+");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -62, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
+    public void separarReales(String cadena, int linea) {
+        writeToFile(cadena, -62, linea);
     }
 
     /*
@@ -128,128 +159,71 @@ public class AnalizadorLexico {
      * de texto como salida.
      */
     public void categorizar(String cadena, int linea) {
-        // Primero se separa por los que coincidan con el patron de los comentarios
-        pattern = Pattern.compile("//.*?//");
-        matcher = pattern.matcher(cadena);
-
         String[] cadenas = fragmentar(cadena);
-        pattern = Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*[#%&$?]"); // Identificadores
-        // De las cadenas que regresen del split se analizan para determinar a que
-        // pertenece
         for (String cad : cadenas) {
-            caracteresespeciales(cad, linea);
-            operadoresArit(cad, linea);
-            operadoresRel(cad, linea);
-            operadoresLog(cad, linea);
-            System.out.println("cadena fragmentizada: " + cad);
-            if (pattern.matcher(cad).matches()) { // Identificadores
-                if (ids.containsKey(cad.charAt(cad.length() - 1)))
-                    writeToFile(cad, ids.get(cad.charAt(cad.length() - 1)), linea);
+            if(isComentario(cad)){
+                separarComentario(cad, linea);
+                continue;
+            }
+            if(isCaraEspecial(cad)){
+                caracteresespeciales(cad, linea);
+                continue;
+            }
+            if(isOperadorAritmetico(cad)){
+                operadoresArit(cad, linea);
+                continue;
+            }
+            if(isOperadorRelacional(cad)){
+                operadoresRel(cad, linea);
+                continue;
+            }
+            if(isOperadorLogico(cad)){
+                operadoresLog(cad, linea);
+                continue;
+            }
+            if (ids.containsKey(cad.charAt(cad.length() - 1))) {
+                writeToFile(cad, ids.get(cad.charAt(cad.length() - 1)), linea);
                 continue;
             }
             if (reservadas.containsKey(cad)) { // Palabras reservadas
                 writeToFile(cad, reservadas.get(cad), linea);
                 continue;
             }
-            if(numerosEnteros(cad))
-                cad = separarInts(cad, linea);
-            if(numeroReal(cad))
-                cad = separarReales(cad, linea);
-            valorBool(cad, linea);
-            cad = separarComentario(cad, linea);
-            cad = separarStrings(cad, linea);
+            if(numerosEnteros(cad)) {
+                separarInts(cad, linea);
+                continue;
+            }
+            if(numeroReal(cad)) {
+                separarReales(cad, linea);
+                continue;
+            }
+            if(isBoolean(cad)){
+                valorBool(cad, linea);
+                continue;
+            }
+            if(isString(cad))
+                separarStrings(cad, linea);
         }
     }
 
-    public String separarComentario(String cadena, int linea){
-        Pattern pattern = Pattern.compile("//.*?//");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -56, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena.replaceAll("//.*", ""); //Esto es simplemente para quitar los comentarios que no sean validos
+    public void separarComentario(String cadena, int linea){
+        writeToFile(cadena, -56, linea);
     }
 
     public boolean isComentario(String cadena){
         return cadena.matches("//.*?//");
     }
 
-    public String separarStrings(String cadena, int linea){
-        Pattern pattern = Pattern.compile("\".*?\"");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -63, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
-    }
-    public void operadoresArit(String cadena, int linea) {
-        // System.out.println("cadena: " + cadena+"estoy en la oparit");
-        if(isComentario(cadena))
-            return;
-        int size = cadena.length();
-        for (int i = 0; i < size; i++) {
-            char operador = cadena.charAt(i);
-            if (operador == '*') {
-                writeToFile("*", -21, linea);
-            } else if (operador == '/') {
-                writeToFile("/", -22, linea);
-            } else if (operador == '+') {
-                writeToFile("+", -24, linea);
-            } else if (operador == '-') {
-                writeToFile("-", -25, linea);
-            } else if (operador == ':' && !(size == 1) && cadena.charAt(i + 1) == '=') {
-                writeToFile(":=", -26, linea);
-                i++; // Avanzar un carácter extra
-            }
-        }
+    public boolean isBoolean(String cadena){
+        return cadena.matches("true|false");
     }
 
-    public void operadoresRel(String cadena, int linea) {
-        // System.out.println("cadena: " + cadena+ "estoy en la oprel");
-        int size = cadena.length();
-        for (int i = 0; i < size; i++) {
-            char operador = cadena.charAt(i);
-            if (operador == '<') {
-                if (i + 1 < size && cadena.charAt(i + 1) == '=') {
-                    writeToFile("<=", -32, linea);
-                    i++; // Avanzar un carácter extra
-                } else {
-                    writeToFile("<", -31, linea);
-                }
-            } else if (operador == '>') {
-                if (i + 1 < size && cadena.charAt(i + 1) == '=') {
-                    writeToFile(">=", -34, linea);
-                    i++; // Avanzar un carácter extra
-                } else {
-                    writeToFile(">", -33, linea);
-                }
-            } else if (operador == '=' && i + 1 < size && cadena.charAt(i + 1) == '=') {
-                writeToFile("==", -35, linea);
-                i++; // Avanzar un carácter extra
-            } else if (operador == '!' && i + 1 < size && cadena.charAt(i + 1) == '=') {
-                writeToFile("!=", -36, linea);
-                i++; // Avanzar un carácter extra
-            }
-        }
+    public boolean isString(String cadena){
+        return cadena.matches("\".*?\"");
     }
 
-    public void operadoresLog(String cadena, int linea) {
-        // System.out.print("cadena: " + cadena+"estoy en la oplog");
-        int size = cadena.length();
-        for (int i = 0; i < size; i++) {
-            char operador = cadena.charAt(i);
-            if (operador == '&' && i + 1 < size && cadena.charAt(i + 1) == '&') {
-                writeToFile("&&", -41, linea);
-                i++; // Avanzar un carácter extra
-            } else if (operador == '|' && i + 1 < size && cadena.charAt(i + 1) == '|') {
-                writeToFile("||", -42, linea);
-                i++; // Avanzar un carácter extra
-            } else if (operador == '!') {
-                writeToFile("!", -43, linea);
-            }
-        }
+    public boolean isOperadorAritmetico(String cadena) {
+        return cadena.matches("[+\\-*/:=]+");
     }
 
     // Expresión regular para números enteros (uno o más dígitos, no incluye
@@ -266,24 +240,34 @@ public class AnalizadorLexico {
         return Pattern.matches(patronDecimal, cadena);
     }
 
+    public boolean isCaraEspecial(String cadena) {
+        return  cadena.matches("[;:,()]+");
+    }
+
+    public boolean isOperadorRelacional(String cadena) {
+        return cadena.matches("[<>=!]+");
+    }
+
+    public boolean isOperadorLogico(String cadena) {
+        return cadena.matches("[&|!]+");
+    }
+
+    public void operadoresRel(String cadena, int linea) {
+        if(!opRelacionales.containsKey(cadena))
+            return;
+        writeToFile(cadena, opRelacionales.get(cadena), linea);
+    }
+
+    public void operadoresLog(String cadena, int linea) {
+        if(!opLogicos.containsKey(cadena))
+            return;
+        writeToFile(cadena, opLogicos.get(cadena), linea);
+    }
 
     public void caracteresespeciales(String cadena, int linea) {
-        int size = cadena.length();
-        for (int i = 0; i < size; i++) {
-            char caracter = cadena.charAt(i);
-            if (caracter == '(') {
-                writeToFile("(", -73, linea);
-            } else if (caracter == ')') {
-                writeToFile(")", -74, linea);
-            } else if (caracter == ';') {
-                writeToFile(";", -75, linea);
-            } else if (caracter == ',') {
-                writeToFile(",", -76, linea);
-            } else if (caracter == ':' && cadena.length() > 1 && cadena.charAt(i + 1) != '=') {
-                writeToFile(":", -77, linea);
-                i++;
-            }
-        }
+        if(!carEspecial.containsKey(cadena))
+            return;
+        writeToFile(cadena, carEspecial.get(cadena), linea);
     }
 
     //Metodo que se usa para saber si hay un valor booleano
@@ -291,12 +275,19 @@ public class AnalizadorLexico {
         switch (cadena) {
             case "true":
                 writeToFile(cadena, -64, linea);
-                return;
+                break;
             case "false":
                 writeToFile(cadena, -65, linea);
-                return;
-            default:
+                break;
         }
+    }
+
+    public void separarStrings(String cadena, int linea){
+        writeToFile(cadena, -63, linea);
+    }
+    public void operadoresArit(String cadena, int linea) {
+        // System.out.println("cadena: " + cadena+"estoy en la oparit");
+        writeToFile(cadena, opAritmeticos.get(cadena), linea);
     }
 
     /*

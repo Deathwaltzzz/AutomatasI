@@ -1,31 +1,4 @@
-// Inicia programa //
-program example;
-var
-    num1#,num2: int;
-    result: real;
-begin
-    num1 := 10;
-    num2:=5;
-    result := num1 + num2*2.5;
-    if result >= 20.0 then
-        write("Result is greater than or equal to 20" );
-    else
-        write("Result is less than 20");
-
-    if 10 && 5 then
-        write("10 and 5 are true");
-    else
-        write("10 and 5 are false");
-
-    if 10 || 5 then
-        write("10 or 5 are true");
-    else
-        write("10 or 5 are false");
-
-    if !10 then
-        write("10 is false");
-    else
-        write("10 is true");
-end.
-
-// termino //
+int x# := 2; // esto es una asignacion //
+int y# := 3; // esto es una asignacion //
+int z# := x# + y#; // esto es una asignacion y operacion //
+// hola //

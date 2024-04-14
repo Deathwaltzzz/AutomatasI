@@ -89,7 +89,7 @@ public class AnalizadorLexico {
 
     public String[] fragmentar(String linea) {
         /*Ni Dios sabe como hice esta REGEX, pero de alguna forma funciona para TODOS Los casos (en teoria)*/
-        pattern = Pattern.compile("\".*?\"|:=|<=|>=|==|!=|\\|{2}|&&|\\d+\\.\\d*|\\b[a-zA-Z\\d]+\\b[#%&$?]*|[-+*;,><:=()!]|\\b[();,:]+\\s*^\".*\"$|^/{2}.*/{2}$");
+        pattern = Pattern.compile("\".*?\"|/{2}.*/{2}|:=|<=|>=|==|!=|\\|{2}|&&|\\d+\\.\\d*|\\b[a-zA-Z\\d]+\\b[#%&$?]*|[-+*;,><:=()!]|\\b[();,:]+\\s*^\".*\"$");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();

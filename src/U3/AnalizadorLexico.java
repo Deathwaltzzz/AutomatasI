@@ -91,7 +91,7 @@ public class AnalizadorLexico {
         // Utilizamos expresión regular para encontrar caracteres especiales, cadenas
         // entre comillas y cualquier secuencia de caracteres que no sea un espacio en
         // blanco
-        pattern = Pattern.compile("\"[^\"]*\"|\\(|\\)|;|,|:|\\S*[^\\s();,:]+\\s*");
+        pattern = Pattern.compile("\".*?\"|:=|<=|>=|==|!=|\\|{2}|&&|\\d+\\.\\d*|\\b[a-zA-Z\\d]+\\b[#%&$?]*|[-+*;,><:=()!]|\\b[();,:]+\\s*^\".*\"$|^/{2}.*/{2}$");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();
@@ -106,7 +106,7 @@ public class AnalizadorLexico {
     }
 
     public String separarInts(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("\\b\\d+\\b");
+        Pattern pattern = Pattern.compile("-?\\b\\d+\\b");
         Matcher matcher = pattern.matcher(cadena);
         while (matcher.find()) {
             writeToFile(matcher.group(), -61, linea);
@@ -116,7 +116,7 @@ public class AnalizadorLexico {
     }
 
     public String separarReales(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("\\d+\\.\\d+");
+        Pattern pattern = Pattern.compile("-?\\d+\\.\\d+");
         Matcher matcher = pattern.matcher(cadena);
         while (matcher.find()) {
             writeToFile(matcher.group(), -62, linea);
@@ -133,8 +133,7 @@ public class AnalizadorLexico {
         // Primero se separa por los que coincidan con el patron de los comentarios
         pattern = Pattern.compile("//.*?//");
         matcher = pattern.matcher(cadena);
-        cadena = separarComentario(cadena, linea);
-        cadena = separarStrings(cadena, linea);
+
         String[] cadenas = fragmentar(cadena);
         pattern = Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*[#%&$?]"); // Identificadores
         // De las cadenas que regresen del split se analizan para determinar a que
@@ -159,6 +158,8 @@ public class AnalizadorLexico {
             if(numeroReal(cad))
                 cad = separarReales(cad, linea);
             valorBool(cad, linea);
+            cad = separarComentario(cad, linea);
+            cad = separarStrings(cad, linea);
         }
     }
 
@@ -172,6 +173,10 @@ public class AnalizadorLexico {
         return cadena.replaceAll("//.*", ""); //Esto es simplemente para quitar los comentarios que no sean validos
     }
 
+    public boolean isComentario(String cadena){
+        return cadena.matches("//.*?//");
+    }
+
     public String separarStrings(String cadena, int linea){
         Pattern pattern = Pattern.compile("\".*?\"");
         Matcher matcher = pattern.matcher(cadena);
@@ -183,8 +188,10 @@ public class AnalizadorLexico {
     }
     public void operadoresArit(String cadena, int linea) {
         // System.out.println("cadena: " + cadena+"estoy en la oparit");
-        int tamaño = cadena.length();
-        for (int i = 0; i < tamaño; i++) {
+        if(isComentario(cadena))
+            return;
+        int size = cadena.length();
+        for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
             if (operador == '*') {
                 writeToFile("*", -21, linea);
@@ -194,7 +201,7 @@ public class AnalizadorLexico {
                 writeToFile("+", -24, linea);
             } else if (operador == '-') {
                 writeToFile("-", -25, linea);
-            } else if (operador == ':' && i + 1 < tamaño && cadena.charAt(i + 1) == '=') {
+            } else if (operador == ':' && !(size == 1) && cadena.charAt(i + 1) == '=') {
                 writeToFile(":=", -26, linea);
                 i++; // Avanzar un carácter extra
             }
@@ -203,27 +210,27 @@ public class AnalizadorLexico {
 
     public void operadoresRel(String cadena, int linea) {
         // System.out.println("cadena: " + cadena+ "estoy en la oprel");
-        int tamaño = cadena.length();
-        for (int i = 0; i < tamaño; i++) {
+        int size = cadena.length();
+        for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
             if (operador == '<') {
-                if (i + 1 < tamaño && cadena.charAt(i + 1) == '=') {
+                if (i + 1 < size && cadena.charAt(i + 1) == '=') {
                     writeToFile("<=", -32, linea);
                     i++; // Avanzar un carácter extra
                 } else {
                     writeToFile("<", -31, linea);
                 }
             } else if (operador == '>') {
-                if (i + 1 < tamaño && cadena.charAt(i + 1) == '=') {
+                if (i + 1 < size && cadena.charAt(i + 1) == '=') {
                     writeToFile(">=", -34, linea);
                     i++; // Avanzar un carácter extra
                 } else {
                     writeToFile(">", -33, linea);
                 }
-            } else if (operador == '=' && i + 1 < tamaño && cadena.charAt(i + 1) == '=') {
+            } else if (operador == '=' && i + 1 < size && cadena.charAt(i + 1) == '=') {
                 writeToFile("==", -35, linea);
                 i++; // Avanzar un carácter extra
-            } else if (operador == '!' && i + 1 < tamaño && cadena.charAt(i + 1) == '=') {
+            } else if (operador == '!' && i + 1 < size && cadena.charAt(i + 1) == '=') {
                 writeToFile("!=", -36, linea);
                 i++; // Avanzar un carácter extra
             }
@@ -232,13 +239,13 @@ public class AnalizadorLexico {
 
     public void operadoresLog(String cadena, int linea) {
         // System.out.print("cadena: " + cadena+"estoy en la oplog");
-        int tamaño = cadena.length();
-        for (int i = 0; i < tamaño; i++) {
+        int size = cadena.length();
+        for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
-            if (operador == '&' && i + 1 < tamaño && cadena.charAt(i + 1) == '&') {
+            if (operador == '&' && i + 1 < size && cadena.charAt(i + 1) == '&') {
                 writeToFile("&&", -41, linea);
                 i++; // Avanzar un carácter extra
-            } else if (operador == '|' && i + 1 < tamaño && cadena.charAt(i + 1) == '|') {
+            } else if (operador == '|' && i + 1 < size && cadena.charAt(i + 1) == '|') {
                 writeToFile("||", -42, linea);
                 i++; // Avanzar un carácter extra
             } else if (operador == '!') {
@@ -263,8 +270,8 @@ public class AnalizadorLexico {
 
 
     public void caracteresespeciales(String cadena, int linea) {
-        int tamaño = cadena.length();
-        for (int i = 0; i < tamaño; i++) {
+        int size = cadena.length();
+        for (int i = 0; i < size; i++) {
             char caracter = cadena.charAt(i);
             if (caracter == '(') {
                 writeToFile("(", -73, linea);
@@ -274,7 +281,7 @@ public class AnalizadorLexico {
                 writeToFile(";", -75, linea);
             } else if (caracter == ',') {
                 writeToFile(",", -76, linea);
-            } else if (caracter == ':' && cadena.charAt(i + 1) != '=') {
+            } else if (caracter == ':' && cadena.length() > 1 && cadena.charAt(i + 1) != '=') {
                 writeToFile(":", -77, linea);
                 i++;
             }

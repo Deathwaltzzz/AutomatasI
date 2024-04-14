@@ -1,8 +1,31 @@
-4 7.3 -8.1 true false TRUE .hola. 6.2 . "true && true", "Esto es un string", int x#, real y&, a==b, int num1# * num3#, (a:=5), "hola", numero1_&
-string, bool while then do int a+c;
-"true && true" //5/8
-//45/8-9
-bool 45+6*-9 (56<=52!5)
-"a1-23"
-// Comentario valido // //Comentario no valido+3
-//Comentario// seguido# hola% program begin end 45+8||56
+// Inicia programa //
+program example;
+var
+    num1#,num2: int;
+    result: real;
+begin
+    num1 := 10;
+    num2:=5;
+    result := num1 + num2*2.5;
+    if result >= 20.0 then
+        write("Result is greater than or equal to 20" );
+    else
+        write("Result is less than 20");
+
+    if 10 && 5 then
+        write("10 and 5 are true");
+    else
+        write("10 and 5 are false");
+
+    if 10 || 5 then
+        write("10 or 5 are true");
+    else
+        write("10 or 5 are false");
+
+    if !10 then
+        write("10 is false");
+    else
+        write("10 is true");
+end.
+
+// termino //

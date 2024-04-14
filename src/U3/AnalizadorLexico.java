@@ -88,9 +88,7 @@ public class AnalizadorLexico {
     }
 
     public String[] fragmentar(String linea) {
-        // Utilizamos expresión regular para encontrar caracteres especiales, cadenas
-        // entre comillas y cualquier secuencia de caracteres que no sea un espacio en
-        // blanco
+        /*Ni Dios sabe como hice esta REGEX, pero de alguna forma funciona para TODOS Los casos (en teoria)*/
         pattern = Pattern.compile("\".*?\"|:=|<=|>=|==|!=|\\|{2}|&&|\\d+\\.\\d*|\\b[a-zA-Z\\d]+\\b[#%&$?]*|[-+*;,><:=()!]|\\b[();,:]+\\s*^\".*\"$|^/{2}.*/{2}$");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos

@@ -14,6 +14,7 @@ public class AL2 {
     public HashMap<String, Integer> reservadas = new HashMap<>();
     public Pattern pattern;
     public Matcher matcher;
+    public int errores = 0;
 
     public AL2() {
         // Declaracion de los posibles identificadores en una expresion
@@ -69,9 +70,9 @@ public class AL2 {
             Scanner sc = new Scanner(archivo);
             while (sc.hasNextLine()) {
                 String linea = sc.nextLine();
-                System.out.println("Linea: " + linea);
                 categorizar(linea, ++i);
             }
+            System.out.printf("Se encontraron %d errores\n", errores);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -88,12 +89,10 @@ public class AL2 {
     }
 
     public String[] fragmentar(String linea) {
-        /*Ni Dios sabe como hice esta REGEX, pero de alguna forma funciona para TODOS Los casos (en teoria)*/
         pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|\\||&&|-?\\d+\\.\\d*|[-+*;,<>():!]|\\d+!|\\b[a-zA-Z\\d_]+\\b[#%&$?]*|\\.[^ \\t\\n\\r\\f\\v]+");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();
-
         // Agregar los fragmentos obtenidos al ArrayList
         while (matcher.find()) {
             String fragmento = matcher.group().trim(); // Eliminamos espacios en blanco al inicio y al final
@@ -103,91 +102,88 @@ public class AL2 {
         return fragmentos.toArray(new String[0]);
     }
 
-    public String separarInts(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("-?\\b\\d+\\b");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -61, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
-    }
-
-    public String separarReales(String cadena, int linea) {
-        Pattern pattern = Pattern.compile("-?\\d+\\.\\d+");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            writeToFile(matcher.group(), -62, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
-    }
 
     /*
      * Metodo para categorizar las cadenas que llegan y escribirlas en el archivo
      * de texto como salida.
      */
     public void categorizar(String cadena, int linea) {
-        // Primero se separa por los que coincidan con el patron de los comentarios
-        pattern = Pattern.compile("//.*?//");
-        matcher = pattern.matcher(cadena);
-
         String[] cadenas = fragmentar(cadena);
-        pattern = Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*[#%&$?]"); // Identificadores
         // De las cadenas que regresen del split se analizan para determinar a que
         // pertenece
         for (String cad : cadenas) {
-            caracteresespeciales(cad, linea);
-            operadoresArit(cad, linea);
-            operadoresRel(cad, linea);
-            operadoresLog(cad, linea);
-            System.out.println("cadena fragmentizada: " + cad);
-            if (pattern.matcher(cad).matches()) { // Identificadores
-                if (ids.containsKey(cad.charAt(cad.length() - 1)))
-                    writeToFile(cad, ids.get(cad.charAt(cad.length() - 1)), linea);
+            if(caracteresespeciales(cad, linea)) continue;
+            if(operadoresArit(cad, linea)) continue;
+            if(operadoresRel(cad, linea)) continue;
+            if(operadoresLog(cad, linea)) continue;
+            if (ids.containsKey(cad.charAt(cad.length() - 1))) {
+                writeToFile(cad, ids.get(cad.charAt(cad.length() - 1)), linea);
                 continue;
             }
             if (reservadas.containsKey(cad)) { // Palabras reservadas
                 writeToFile(cad, reservadas.get(cad), linea);
                 continue;
             }
-            if(numerosEnteros(cad))
-                cad = separarInts(cad, linea);
-            if(numeroReal(cad))
-                cad = separarReales(cad, linea);
-            valorBool(cad, linea);
-            cad = separarComentario(cad, linea);
-            cad = separarStrings(cad, linea);
+            if(separarInts(cad, linea)) continue;
+            if(separarReales(cad, linea)) continue;
+            if(valorBool(cad, linea)) continue;
+            if(separarComentario(cad, linea)) continue;
+            if(separarStrings(cad, linea)) continue;
+            System.out.printf("Error en la linea %d, no se reconoce el token %s\n", linea, cad);
+            errores++;
         }
     }
 
-    public String separarComentario(String cadena, int linea){
+
+
+    public boolean separarInts(String cadena, int linea) {
+        if(!cadena.matches("\\b\\d+\\b")) return false;
+        Pattern pattern = Pattern.compile("\\b\\d+\\b");
+        Matcher matcher = pattern.matcher(cadena);
+        int i = 0;
+        while (matcher.find()) {
+            writeToFile(matcher.group(), -61, linea);
+            i++;
+        }
+        return true;
+    }
+
+    public boolean separarReales(String cadena, int linea) {
+        if (!cadena.matches("-?\\d+\\.\\d*")) return false;
+        Pattern pattern = Pattern.compile("-?\\d+\\.\\d+");
+        Matcher matcher = pattern.matcher(cadena);
+        while (matcher.find())
+            writeToFile(matcher.group(), -62, linea);
+        return true;
+    }
+
+    public boolean separarComentario(String cadena, int linea){
+        if(!cadena.matches("//.*?//")) return false;
         Pattern pattern = Pattern.compile("//.*?//");
         Matcher matcher = pattern.matcher(cadena);
         while (matcher.find()) {
-            writeToFile(matcher.group(), -56, linea);
-            cadena = cadena.replace(matcher.group(), "");
+            System.out.println(matcher.group() + " comentario en linea "+ linea );
         }
-        return cadena.replaceAll("//.*", ""); //Esto es simplemente para quitar los comentarios que no sean validos
+        return true;
     }
 
     public boolean isComentario(String cadena){
         return cadena.matches("//.*?//");
     }
 
-    public String separarStrings(String cadena, int linea){
+    public boolean separarStrings(String cadena, int linea){
+        if(!cadena.matches("\".*?\"")) return false;
         Pattern pattern = Pattern.compile("\".*?\"");
         Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
+        while (matcher.find())
             writeToFile(matcher.group(), -63, linea);
-            cadena = cadena.replace(matcher.group(), "");
-        }
-        return cadena;
+        return true;
     }
-    public void operadoresArit(String cadena, int linea) {
+
+    public boolean operadoresArit(String cadena, int linea) {
         // System.out.println("cadena: " + cadena+"estoy en la oparit");
-        if(isComentario(cadena))
-            return;
+        if(isComentario(cadena) || !cadena.matches("[+\\-*/]|:="))
+            return false;
         int size = cadena.length();
         for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
@@ -204,10 +200,11 @@ public class AL2 {
                 i++; // Avanzar un carácter extra
             }
         }
+        return true;
     }
 
-    public void operadoresRel(String cadena, int linea) {
-        // System.out.println("cadena: " + cadena+ "estoy en la oprel");
+    public boolean operadoresRel(String cadena, int linea) {
+        if(!cadena.matches("[<>=!]+")) return false;
         int size = cadena.length();
         for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
@@ -233,10 +230,12 @@ public class AL2 {
                 i++; // Avanzar un carácter extra
             }
         }
+        return true;
     }
 
-    public void operadoresLog(String cadena, int linea) {
-        // System.out.print("cadena: " + cadena+"estoy en la oplog");
+    public boolean operadoresLog(String cadena, int linea) {
+        if(!cadena.matches("[&|!]+"))
+            return false;
         int size = cadena.length();
         for (int i = 0; i < size; i++) {
             char operador = cadena.charAt(i);
@@ -246,28 +245,16 @@ public class AL2 {
             } else if (operador == '|' && i + 1 < size && cadena.charAt(i + 1) == '|') {
                 writeToFile("||", -42, linea);
                 i++; // Avanzar un carácter extra
-            } else if (operador == '!' && size == 1){
+            } else if (operador == '!' && size ==1){
                 writeToFile("!", -43, linea);
             }
         }
+        return true;
     }
 
-    // Expresión regular para números enteros (uno o más dígitos, no incluye
-    // negativos
-    public boolean numerosEnteros(String cadena) {
-        String patronEntero = "^\\d+$";
-        return Pattern.matches(patronEntero, cadena);
-    }
-
-    // Expresión regular para números decimales (uno o más dígitos seguidos de punto
-    // y uno o más dígitos
-    public boolean numeroReal(String cadena) {
-        String patronDecimal = "^-?\\d+\\.\\d+$";
-        return Pattern.matches(patronDecimal, cadena);
-    }
-
-
-    public void caracteresespeciales(String cadena, int linea) {
+    public boolean caracteresespeciales(String cadena, int linea) {
+        if(!cadena.matches("[;:,()]+"))
+            return false;
         int size = cadena.length();
         for (int i = 0; i < size; i++) {
             char caracter = cadena.charAt(i);
@@ -284,19 +271,21 @@ public class AL2 {
                 i++;
             }
         }
+        return true;
     }
 
     //Metodo que se usa para saber si hay un valor booleano
-    private void valorBool(String cadena, int linea) {
+    private boolean valorBool(String cadena, int linea) {
         switch (cadena) {
             case "true":
                 writeToFile(cadena, -64, linea);
-                return;
+                return true;
             case "false":
                 writeToFile(cadena, -65, linea);
-                return;
+                return true;
             default:
         }
+        return false;
     }
 
     /*
@@ -314,4 +303,4 @@ public class AL2 {
             System.out.println(e.getMessage());
         }
     }
-}
+}//fin de la clase

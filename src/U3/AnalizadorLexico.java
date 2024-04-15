@@ -201,8 +201,11 @@ public class AnalizadorLexico {
                 valorBool(cad, linea);
                 continue;
             }
-            if(isString(cad))
+            if(isString(cad)) {
                 separarStrings(cad, linea);
+                continue;
+            }
+            System.out.printf("Error en la linea %d, no se reconoce el token %s\n", linea, cad);
         }
     }
 
@@ -236,7 +239,7 @@ public class AnalizadorLexico {
     // Expresión regular para números decimales (uno o más dígitos seguidos de punto
     // y uno o más dígitos
     public boolean numeroReal(String cadena) {
-        String patronDecimal = "^-?\\d+\\.\\d+$";
+        String patronDecimal = "^-?\\d+\\.\\d*$";
         return Pattern.matches(patronDecimal, cadena);
     }
 

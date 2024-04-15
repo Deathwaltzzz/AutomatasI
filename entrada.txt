@@ -7,3 +7,5 @@ int && blue
 hola:=(56.23)
 !not
 hola != hello
+hola_#
+_hola123% //hola mundo//

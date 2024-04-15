@@ -1,7 +1,9 @@
-int x& := 2;
-int y& := 3;
-real z% := x& + y& + 0.2;
-// comentario //
-real w% := -0.5;
-real v% := 0.5;
-int a# := -10;
+5<5;
+5>=8, h==7. true || false;
+52<=45.
+int && blue
+!false !=hello#
+4>6
+hola:=(56.23)
+!not
+hola != hello

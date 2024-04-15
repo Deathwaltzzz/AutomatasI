@@ -133,7 +133,7 @@ public class AnalizadorLexico {
 
     public String[] fragmentar(String linea) {
         /*Ni Dios sabe como hice esta REGEX, pero de alguna forma funciona para TODOS Los casos (en teoria)*/
-        pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|\\||&&|-?\\d+\\.\\d*|[-+*;,<>():]|\\d+!|\\b[a-zA-Z\\d_]+\\b[#%&$?]*|\\.[^ \\t\\n\\r\\f\\v]+");
+        pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|\\||&&|-?\\d+\\.\\d*|[-+*;,<>():!]|\\d+!|\\b[a-zA-Z\\d_]+\\b[#%&$?]*|\\.[^ \\t\\n\\r\\f\\v]+");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();
@@ -223,7 +223,7 @@ public class AnalizadorLexico {
     }
 
     public boolean isOperadorAritmetico(String cadena) {
-        return cadena.matches("[+\\-*/:=]+");
+        return cadena.matches("[+\\-*/]|:=");
     }
 
     // Expresión regular para números enteros (uno o más dígitos, no incluye

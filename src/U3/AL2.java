@@ -116,14 +116,8 @@ public class AL2 {
             if(operadoresArit(cad, linea)) continue;
             if(operadoresRel(cad, linea)) continue;
             if(operadoresLog(cad, linea)) continue;
-            if (ids.containsKey(cad.charAt(cad.length() - 1))) {
-                writeToFile(cad, ids.get(cad.charAt(cad.length() - 1)), linea);
-                continue;
-            }
-            if (reservadas.containsKey(cad)) { // Palabras reservadas
-                writeToFile(cad, reservadas.get(cad), linea);
-                continue;
-            }
+            if(separarIdentificadores(cad, linea)) continue;
+            if(separarReservadas(cad, linea)) continue;
             if(separarInts(cad, linea)) continue;
             if(separarReales(cad, linea)) continue;
             if(valorBool(cad, linea)) continue;
@@ -134,7 +128,18 @@ public class AL2 {
         }
     }
 
+    public boolean separarIdentificadores(String cadena, int linea) {
+        if(!cadena.matches("[a-zA-Z][a-zA-Z\\d_]+[%$#&?]"))
+            return  false;
+        writeToFile(cadena, ids.get(cadena.charAt(cadena.length()-1)), linea);
+        return true;
+    }
 
+    public boolean separarReservadas(String cadena, int linea) {
+        if(!reservadas.containsKey(cadena)) return false;
+        writeToFile(cadena, reservadas.get(cadena), linea);
+        return true;
+    }
 
     public boolean separarInts(String cadena, int linea) {
         if(!cadena.matches("\\b\\d+\\b")) return false;

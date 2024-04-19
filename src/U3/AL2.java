@@ -164,11 +164,8 @@ public class AL2 {
 
     public boolean separarComentario(String cadena, int linea){
         if(!cadena.matches("//.*?//")) return false;
-        Pattern pattern = Pattern.compile("//.*?//");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find()) {
-            System.out.println(matcher.group() + " comentario en linea "+ linea );
-        }
+        System.out.println(matcher.group() + " comentario en linea "+ linea );
+
         return true;
     }
 
@@ -178,10 +175,7 @@ public class AL2 {
 
     public boolean separarStrings(String cadena, int linea){
         if(!cadena.matches("\".*?\"")) return false;
-        Pattern pattern = Pattern.compile("\".*?\"");
-        Matcher matcher = pattern.matcher(cadena);
-        while (matcher.find())
-            writeToFile(matcher.group(), -63, linea);
+        writeToFile(cadena, -63, linea);
         return true;
     }
 

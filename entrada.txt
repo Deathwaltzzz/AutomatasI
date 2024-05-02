@@ -1,5 +1,2 @@
-program%%
-var##
-repeat
-{}
-[]
+
+    bool y$ := true;

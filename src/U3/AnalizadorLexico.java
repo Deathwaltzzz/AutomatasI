@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalizadorLexico {
-    public final String ARCHIVO_SALIDA = "salida.txt";
+    public final String ARCHIVO_SALIDA = "tokens.txt";
     public HashMap<Character, Integer> ids = new HashMap<>();
     public HashMap<String, Integer> reservadas = new HashMap<>();
     public Pattern pattern;
@@ -72,7 +72,20 @@ public class AnalizadorLexico {
                 String linea = sc.nextLine();
                 categorizar(linea, ++i);
             }
-            System.out.printf("Se encontraron %d errores\n", errores);
+            if(errores >= 1) {
+                clearFile();
+                System.out.printf("Se encontraron %d errores\n", errores);
+            }else{
+                System.out.println("Archivo analizado correctamente \n No se encontraron errores\n Tokens generados en tokens.txt\n");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void clearFile() {
+        try (FileWriter fw = new FileWriter(ARCHIVO_SALIDA)) {
+            fw.write("");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -89,7 +102,7 @@ public class AnalizadorLexico {
     }
 
     public String[] fragmentar(String linea) {
-        Pattern pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|!|&&|\\|\\||[-+*;,<>()#:&!=/]|-?\\d+\\.\\d*|\\d+!|\\b[a-zA-Z\\d_]+\\b[#%&$?]?|\\.[^ \\t\\n\\r\\f\\v]+|.");
+        Pattern pattern = Pattern.compile("\\\".*?\\\"|//.*?//|:=|<=|>=|==|!=|!|&&|\\|\\||[-+*;,<>()#:&!=/]\\s*|-?\\d+\\.\\d*\\s*|\\d+!\\s*|\\b[a-zA-Z\\d_]+\\b[#%&$?]?|[^\\s*]");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();

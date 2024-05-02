@@ -1,5 +1,5 @@
-program x begin
-var
-    int x% := 10;
-    real y& := 10.5;
-    bool z$:=true;
+program%%
+var##
+repeat
+{}
+[]

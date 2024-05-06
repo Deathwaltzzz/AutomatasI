@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class AnalizadorSintactico {
 
     public List<Integer> tipoDatos = List.of(-11,-12,-13,-14);
-    public List<Integer> identificador = List.of(-51,-52,-53,-54,-55);
+    public List<Integer> identificadores = List.of(-51,-52,-53,-54,-55);
 
     public AnalizadorSintactico(File file) {
         leerTokens(file);
@@ -32,24 +32,43 @@ public class AnalizadorSintactico {
 
     public void analizar(ArrayList<String[]> tokens) {
         for(int i = 0 ; i < tokens.size() ; i++){
-            if(tipoDatos(Integer.parseInt(tokens.get(i)[0]))){
-
+            String lexema = tokens.get(i)[0];
+            int token = Integer.parseInt(tokens.get(i)[1]);
+            String tipo = tokens.get(i)[2];
+            String linea = tokens.get(i)[3];
+            System.out.println(lexema + " " + token + " " + tipo + " " + linea);
+            if(tipoDeDato(token)) {
+                i++;
+                if (identificador(Integer.parseInt(tokens.get(i)[1]))){
+                    i++;
+                    if(asignacion(Integer.parseInt(tokens.get(i)[1]))){
+                        i++;
+                        if(isBool(Integer.parseInt(tokens.get(i)[1]))){
+                            i++;
+                            if(Integer.parseInt(tokens.get(i)[1]) == -75)
+                                System.out.println("Expresion booleana correcta");
+                        }
+                    }
+                }
             }
+
         }
     }
 
-    public boolean tipoDatos(int lexema){
-        if(tipoDatos.contains(lexema)){
-            return identificador(lexema);
-        }
+    public boolean tipoDeDato(int lexema){
+        return tipoDatos.contains(lexema);
     }
 
     public boolean identificador(int lexema){
-        return identificador.contains(lexema);
+        return identificadores.contains(lexema);
     }
 
-    public boolean asignacion(String token, int i){
-        return true;
+    public boolean asignacion(int lexema ){
+        return lexema == -26;
+    }
+
+    public boolean isBool(int lexema){
+        return lexema == -64 || lexema == -65;
     }
 
 

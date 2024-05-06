@@ -102,7 +102,7 @@ public class AnalizadorLexico {
     }
 
     public String[] fragmentar(String linea) {
-        Pattern pattern = Pattern.compile("\\\".*?\\\"|//.*?//|:=|<=|>=|==|!=|!|&&|\\|\\||[-+*;,<>()#:&!=/]\\s*|-?\\d+\\.\\d*\\s*|\\d+!\\s*|\\b[a-zA-Z\\d_]+\\b[#%&$?]?|[^\\s*]");
+        Pattern pattern = Pattern.compile("\".*?\"|//.*?//|:=|<=|>=|==|!=|!|&&|\\|\\||[-+*;,<>()#:&!=/]\\s*|-?\\d+\\.\\d*\\s*|\\d+!\\s*|\\b[a-zA-Z\\d_]+\\b[#%&$?]?|[^\\s*]");
         matcher = pattern.matcher(linea);
         // ArrayList para almacenar los fragmentos obtenidos
         ArrayList<String> fragmentos = new ArrayList<>();

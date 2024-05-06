@@ -5,7 +5,7 @@ var
     if(x% && z#) then
     begin
        write("memoreno");
-       if(!y% || a# && z% == l% && x$ + 1 == 10 ) then
+       if(!y% || !a# && z% == l% && x$ + 1 == 10 ) then
        begin
           write("hello");
           if(2 + 5 == 7) then

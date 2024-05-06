@@ -201,11 +201,10 @@ public class AnalizadorSintactico {
     }
 
     private void condicional(){
-        booleano();
+        condicion();
     }
 
-    private void booleano(){
-        boolean identificador = false;
+    private void condicion(){
         Token tokenActual = tokens.get(indice);
         if(tokenActual.getToken() == -43){
             avanza();
@@ -213,8 +212,8 @@ public class AnalizadorSintactico {
             if(!identificador(tokenActual.getToken()))
                 error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea());
         }
-        if(!identificador(tokenActual.getToken()) && !identificador)
-            error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea());
+        if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
+            error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea() + "se encontro " + tokenActual.getToken());
         avanza();
         tokenActual = tokens.get(indice);
         if(isOperando(tokenActual.getToken())) {
@@ -238,7 +237,7 @@ public class AnalizadorSintactico {
         if(!isLogical(tokenActual.getToken()))
             error("Se esperaba un operador lógico en la línea " + tokenActual.getNo_linea());
         avanza();
-        booleano();
+        condicion();
     }
 
     private boolean isOperando(int token){

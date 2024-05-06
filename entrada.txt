@@ -1,2 +1,17 @@
-
-    bool y$ := true;
+program hello?;
+var
+ int : i&;
+ begin
+    if(x% && z#) then
+    begin
+       write("memoreno");
+       if(!y% || !a# && z% == l% && x$ + 1 == 10 ) then
+       begin
+          write("hello");
+          if(2) then
+            begin
+                 write("world");
+            end
+       end
+    end
+ end

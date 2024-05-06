@@ -158,7 +158,7 @@ public class AnalizadorSintactico {
         if(tokenActual.getToken() != -73)
             error("Se esperaba '(' en la línea " + tokenActual.getNo_linea());
         avanza();
-        condicional();
+        condicion();
         tokenActual = tokens.get(indice);
         if(tokenActual.getToken() != -74)
             error("Se esperaba ')' en la línea " + tokenActual.getNo_linea());
@@ -198,10 +198,6 @@ public class AnalizadorSintactico {
             case -11, -12, -13, -14, -15 -> { // Esto verifica la estructura de una asignacion
             }
         }
-    }
-
-    private void condicional(){
-        condicion();
     }
 
     private void condicion(){

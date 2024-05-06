@@ -8,7 +8,7 @@ var
        if(!y% || !a# && z% == l% && x$ + 1 == 10 ) then
        begin
           write("hello");
-          if(2 + 5 == 7) then
+          if(2) then
             begin
                  write("world");
             end

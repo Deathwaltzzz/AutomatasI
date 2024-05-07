@@ -2,16 +2,23 @@ program hello?;
 var
  int : i&;
  begin
-    if(( (x% && z#) < (x# + 10 == 5) )) then
+    if(x% && z#) then
     begin
-       write("memoreno");
-       if(!y% || !a# && z% == l% && (x$ + 1 == 10) ) then
+       write("memo");
+       if(x# + 5 == y&) then
+         begin
+             write("Memoso");
+         end
+       else
+         begin
+             write("Memoso 2");
+         end
+    end
+    else
+    begin
+       if(x# + 10 == 5) then
        begin
-          write("hello");
-          if(x# < z%) then
-            begin
-                 write("world");
-            end
+          write("Memoso");
        end
     end
  end

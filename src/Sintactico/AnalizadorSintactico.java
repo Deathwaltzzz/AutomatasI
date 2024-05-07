@@ -175,12 +175,15 @@ public class AnalizadorSintactico {
             tokenActual = tokens.get(indice);
             if( tokenActual.getToken() == -3) {
                 avanza();
-                return;
+                break;
             }
             if(tokenActual.getToken() == -6) ifEstructura();
             else comprobarSentencias(tokenActual);
         }
-
+        tokenActual = tokens.get(indice);
+        if(tokenActual.getToken() == -7)
+            elseEstructura();
+        avanza();
     }
 
     private void comprobarSentencias(Token tokenActual) {
@@ -190,6 +193,7 @@ public class AnalizadorSintactico {
             case -5 -> writeEstructura(); // Esto verifica la estructura de un write
             case -6 -> ifEstructura();
             case -7 -> { // Esto verifica la estructura de un else
+                error("Se esperaba un 'if' en la línea " + tokenActual.getNo_linea());
             }
             case -8 -> { // Esto verifica la estructura de un while
             }
@@ -206,12 +210,14 @@ public class AnalizadorSintactico {
         if(tokenActual.getToken() == -43 && identificador(proximoToken.getToken())){
             avanza();
             tokenActual = tokens.get(indice);
+        }else if(tokenActual.getToken() == -43 && !identificador(proximoToken.getToken())){
+            error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea());
         }
         if(identificador(tokenActual.getToken()) || isConstante(tokenActual.getToken())) {
             avanza();
             tokenActual = tokens.get(indice);
             if(isOperando(tokenActual.getToken()))
-                aritmetica(tokenActual.getToken());
+                aritmetica();
             if(isLogical(tokenActual.getToken()))
                 logica();
         }else if(tokenActual.getToken() == -73) {
@@ -232,7 +238,7 @@ public class AnalizadorSintactico {
             avanza();
     }
 
-    private void aritmetica(int token){
+    private void aritmetica(){
         Token tokenActual;
         avanza();
         tokenActual = tokens.get(indice);
@@ -249,7 +255,7 @@ public class AnalizadorSintactico {
         avanza();
         tokenActual = tokens.get(indice);
         if(isOperando(tokenActual.getToken()))
-            aritmetica(tokenActual.getToken());
+            aritmetica();
         if(isLogical(tokenActual.getToken()))
             logica();
     }
@@ -276,7 +282,23 @@ public class AnalizadorSintactico {
         if(isLogical(tokenActual.getToken()))
             logica();
         if(isOperando(tokenActual.getToken()))
-            aritmetica(tokenActual.getToken());
+            aritmetica();
+    }
+
+    private void elseEstructura(){
+        Token tokenActual = tokens.get(indice);
+        if(tokenActual.getToken() != -7)
+            error("Se esperaba la palabra clave 'else' en la línea " + tokenActual.getNo_linea());
+        avanza();
+        tokenActual = tokens.get(indice);
+        if(tokenActual.getToken() != -2)
+            error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
+        avanza();
+        tokenActual = tokens.get(indice);
+        comprobarSentencias(tokenActual);
+        tokenActual = tokens.get(indice);
+        if(tokenActual.getToken() != -3)
+            error("Se esperaba la palabra clave 'end' en la línea " + tokenActual.getNo_linea());
     }
 
     private boolean isOperando(int token){

@@ -43,7 +43,8 @@ public class AnalizadorSintactico {
     }
 
     private void error(String mensaje) {
-        throw new RuntimeException( mensaje);
+        System.out.println((char)27 + "[31m" + "ERROR SINTACTICO! " + mensaje);
+        System.exit(1);
     }
 
     private void aceptar() {

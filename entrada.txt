@@ -2,7 +2,7 @@ program hello?;
 var
  int : i&;
  begin
-    if(x% && z#) then
+    if(x% && z#) then //Esto es un if basico//
     begin
        write("memo");
        if(x# + 5 == y&) then

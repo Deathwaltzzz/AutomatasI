@@ -6,6 +6,7 @@ public class AnalizadorSintactico {
     private List<Token> tokens;
     private int indice;
     private Token proximoToken;
+    private int cantParentesis = 0;
 
     public AnalizadorSintactico(List<Token> tokens) {
         this.tokens = tokens;
@@ -41,11 +42,12 @@ public class AnalizadorSintactico {
     }
 
     private void error(String mensaje) {
-        throw new RuntimeException( mensaje);
+        throw new RuntimeException(mensaje + " se encontro: " + tokens.get(indice).getLexema());
     }
 
     private void aceptar() {
         System.out.println("El análisis sintáctico ha finalizado sin errores.");
+        System.exit(0);
     }
 
     private void encabezado() {
@@ -81,7 +83,6 @@ public class AnalizadorSintactico {
         boolean varEncontrada = false;
         while (hayTokensRestantes() && tokens.get(indice).getToken() != -2) {
             Token tokenActual = tokens.get(indice);
-
             if (tokenActual.getToken() == -15) {
                 if (!varEncontrada) {
                     avanza();
@@ -104,13 +105,11 @@ public class AnalizadorSintactico {
         Token tokenActual = tokens.get(indice);
         if (tipoDato(tokenActual.getToken())) {
             avanza();
-
             tokenActual = tokens.get(indice);
             if (tokenActual.getToken() != -77) {
                 error("Se esperaba ':' después del tipo de dato en la línea " + tokenActual.getNo_linea());
             }
             avanza();
-
             // Verificar y consumir identificadores
             while (hayTokensRestantes() &&  identificador(tokens.get(indice).getToken())) {
                 avanza();
@@ -157,8 +156,7 @@ public class AnalizadorSintactico {
         Token tokenActual = tokens.get(indice);
         if(tokenActual.getToken() != -73)
             error("Se esperaba '(' en la línea " + tokenActual.getNo_linea());
-        avanza();
-        condicion();
+        condicion(0);
         tokenActual = tokens.get(indice);
         if(tokenActual.getToken() != -74)
             error("Se esperaba ')' en la línea " + tokenActual.getNo_linea());
@@ -200,40 +198,40 @@ public class AnalizadorSintactico {
         }
     }
 
-    private void condicion(){
+    private void condicion(int i){
+        avanza();
         Token tokenActual = tokens.get(indice);
-        if(tokenActual.getToken() == -43){
-            avanza();
-            tokenActual = tokens.get(indice);
-            if(!identificador(tokenActual.getToken()))
-                error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea());
+        if(tokenActual.getToken() == -73) {
+            cantParentesis++;
+            condicion(i+1);
         }
         if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
-            error("Se esperaba un identificador en la línea " + tokenActual.getNo_linea() + "se encontro " + tokenActual.getToken());
+            error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
         avanza();
         tokenActual = tokens.get(indice);
-        if(isOperando(tokenActual.getToken())) {
-            avanza();
-            tokenActual = tokens.get(indice);
-            if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
-                error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
-            avanza();
-            tokenActual = tokens.get(indice);
-            if(tokenActual.getToken() != -35)
-                error("Se esperaba un '==' en la línea " + tokenActual.getNo_linea());
-            avanza();
-            tokenActual = tokens.get(indice);
-            if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
-                error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
-            avanza();
-            tokenActual = tokens.get(indice);
-        }
-        if(tokenActual.getToken() == -74)
-            return;
-        if(!isLogical(tokenActual.getToken()))
-            error("Se esperaba un operador lógico en la línea " + tokenActual.getNo_linea());
+        if(isLogical(tokenActual.getToken()))
+            condicion(i);
+    }
+
+    private boolean isParentesis(int token){
+        return token == -73 || token == -74;
+    }
+
+    private void aritmetico(){
+        Token tokenActual;
         avanza();
-        condicion();
+        tokenActual = tokens.get(indice);
+        if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
+            error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
+        avanza();
+        tokenActual = tokens.get(indice);
+        if(isOperando(tokenActual.getToken())) aritmetico();
+        if(tokenActual.getToken() != -35)
+            error("Se esperaba un '==' en la línea " + tokenActual.getNo_linea());
+        avanza();
+        tokenActual = tokens.get(indice);
+        if(!identificador(tokenActual.getToken()) && !isConstante(tokenActual.getToken()))
+            error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
     }
 
     private boolean isOperando(int token){

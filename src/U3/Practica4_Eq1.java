@@ -5,6 +5,7 @@ import java.io.File;
 public class Practica4_Eq1 {
     public static void main(String[] args) {
         try{
+            System.out.println("ola");
             new AnalizadorLexico().leerArchivo(new File("entrada.txt"));
         }catch (Exception e){
             System.out.println("Ocurrio un error" + e.getMessage());

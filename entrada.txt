@@ -2,13 +2,13 @@ program hello?;
 var
  int : i&;
  begin
-    if(x% && z#) then
+    if(x% && (z# || p%)) then
     begin
-       write("memoreno");
-       if(!y% || !a# && z% == l% && x$ + 1 == 10 ) then
+       write("memo");
+       if(!y% || !a# && z% == l% && (x$ + 1 == 10) || (x# == z&)) then
        begin
           write("hello");
-          if(2) then
+          if(2 && z# && ((x& < z#))) then
             begin
                  write("world");
             end

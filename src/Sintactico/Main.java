@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class Main {
     public static void main(String[] args) {
         List<Token> tokens = new ArrayList<>();
-        Practica4_Eq1.main(args);
+        new Practica4_Eq1().main(args);
         try (BufferedReader br = new BufferedReader(new FileReader("tokens.txt"))) {
             String line;
             int lineNumber = 1;

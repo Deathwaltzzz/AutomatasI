@@ -76,10 +76,6 @@ public class AnalizadorSintactico {
         }
         avanza(); // Avanzamos al próximo token
 
-        // Verificamos si hay un punto y coma después del identificador
-        if (!hayTokensRestantes()) {
-            error("Se esperaba un punto y coma ';' después del identificador");
-        }
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -75) {
             error("Se esperaba un punto y coma ';' después del identificador ");
@@ -105,6 +101,13 @@ public class AnalizadorSintactico {
             if (!varEncontrada) {
                 error("Se esperaba la palabra clave 'var' en la línea " + tokenActual.getNo_linea());
             } else {
+                if(!tipoDato(tokenActual.getToken()))
+                    error("Se esperaba un tipo de dato válido en la línea " + tokenActual.getNo_linea());
+                avanza();
+                tokenActual = tokens.get(indice);
+                if(tokenActual.getToken() != -77)
+                    error("Se esperaba ':' después del tipo de dato en la línea " + tokenActual.getNo_linea());
+                avanza();
                 declaracionVariable();
             }
         }
@@ -116,13 +119,6 @@ public class AnalizadorSintactico {
         // Manejo de las declaraciones de variables
         Token tokenActual = tokens.get(indice);
 
-        if(!tipoDato(tokenActual.getToken()))
-            error("Se esperaba un tipo de dato válido en la línea " + tokenActual.getNo_linea());
-        avanza();
-        tokenActual = tokens.get(indice);
-        if(tokenActual.getToken() != -77)
-            error("Se esperaba ':' después del tipo de dato en la línea " + tokenActual.getNo_linea());
-        avanza();
         // Verificar y consumir identificadores
         tokenActual = tokens.get(indice);
         if (identificador(tokenActual.getToken())) {

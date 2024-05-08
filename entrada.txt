@@ -1,9 +1,11 @@
-program hello?;
+program nombre?;
 var
- int : i&;
- real: x%;
+    int : uno&, dos& ;
+    real : tres% ;
+    string : cuatro#;
+    bool : cinco$ ;
  begin
-    while(x# > 10) do
+    while(x# > 10 && (5 || 10)) do
     begin
         x# := x# - 1;
         if(x# + 5 - 10 * 5 == 0) then

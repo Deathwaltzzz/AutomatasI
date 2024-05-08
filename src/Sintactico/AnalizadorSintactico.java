@@ -284,18 +284,8 @@ public class AnalizadorSintactico {
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
         cantBegin++;
         avanza();
-        while (hayTokensRestantes()) {
-            tokenActual = tokens.get(indice);
-            if (tokenActual.getToken() == -3) {
-                avanza();
-                cantEnd++;
-                break;
-            }
-            if (tokenActual.getToken() == -6)
-                ifEstructura();
-            else
-                comprobarSentencias(tokenActual);
-        }
+        estructuraSentencias();
+        avanza();
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() == -7)
             elseEstructura();
@@ -356,6 +346,10 @@ public class AnalizadorSintactico {
             error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
         avanza();
         tokenActual = tokens.get(indice);
+        if(isOperando(tokenActual.getToken())) {
+            aritmetica();
+            return;
+        }
         if (tokenActual.getToken() != -35)
             error("Se esperaba un '==' en la línea " + tokenActual.getNo_linea());
         avanza();
@@ -405,8 +399,7 @@ public class AnalizadorSintactico {
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
         cantBegin++;
         avanza();
-        tokenActual = tokens.get(indice);
-        comprobarSentencias(tokenActual);
+        estructuraSentencias();
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -3)
             error("Se esperaba la palabra clave 'end' en la línea " + tokenActual.getNo_linea());
@@ -576,7 +569,7 @@ public class AnalizadorSintactico {
     }
 
     private boolean isPrintable(int token) {
-        return identificador(token) || (token >= -65 && token <= -61) || isConstante(token);
+        return identificador(token) || isConstante(token);
     }
 
     private boolean isConstante(int token) {

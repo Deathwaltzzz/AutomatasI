@@ -6,13 +6,13 @@ var
     while(x# > 10) do
     begin
         x# := x# - 1;
-        if(x# == 5) then
+        if(x# + 5 - 10 * 5 == 0) then
         begin
             x# := x# + 1;
         end
         else
         begin
-            x# := x# - 1;
+            x# := x# - 1 + 10;
         end
         repeat
         begin
@@ -20,5 +20,5 @@ var
         end
         until(x# == 10);
         read(x#);
-
+    end
 end

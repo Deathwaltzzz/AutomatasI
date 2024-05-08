@@ -34,7 +34,7 @@ public class Main {
                 lineNumber++;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error al leer el archivo de tokens.");
         }
 
         /**

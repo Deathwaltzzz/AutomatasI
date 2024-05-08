@@ -1,24 +1,24 @@
 program hello?;
 var
  int : i&;
+ real: x%;
  begin
-    if(x% && z#) then //Esto es un if basico//
+    while(x# > 10) do
     begin
-       write("memo");
-       if(x# + 5 == y&) then
-         begin
-             write("Memoso");
-         end
-       else
-         begin
-             write("Memoso 2");
-         end
-    end
-    else
-    begin
-       if(x# + 10 == 5) then
-       begin
-          write("Memoso");
-       end
-    end
- end
+        x# := x# - 1;
+        if(x# == 5) then
+        begin
+            x# := x# + 1;
+        end
+        else
+        begin
+            x# := x# - 1;
+        end
+        repeat
+        begin
+            x# := x# + 1;
+        end
+        until(x# == 10);
+        read(x#);
+
+end

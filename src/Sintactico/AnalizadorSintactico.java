@@ -18,15 +18,13 @@ public class AnalizadorSintactico {
 
     public void analizar() {
         try {
-            while (hayTokensRestantes()) {
-                encabezado();
-                declaraciones(false);
-                estructuraPrograma();
-            }
-            error("Se esperaba la palabra clave 'end' al final del programa");
+            encabezado();
+            declaraciones(false);
+            estructuraPrograma();
+            error("No se esperaba la palabra clave 'end' en la línea " + tokens.get(indice).getNo_linea());
         } catch (Exception e) {
-            if(e instanceof IndexOutOfBoundsException || e instanceof NullPointerException)
-                error("Ocurrio un error catastrofico! " + "cerraste todos tus begin con end? \nComprueba la linea " + tokens.get(indice-1).getNo_linea());
+            if (e instanceof IndexOutOfBoundsException || e instanceof NullPointerException)
+                error("Ocurrio un error catastrofico! " + "cerraste todos tus begin con end? \nComprueba la linea " + tokens.get(indice - 1).getNo_linea());
             error("Ocurrio un error catastrofico! " + e.getMessage());
         }
     }
@@ -101,11 +99,11 @@ public class AnalizadorSintactico {
             if (!varEncontrada) {
                 error("Se esperaba la palabra clave 'var' en la línea " + tokenActual.getNo_linea());
             } else {
-                if(!tipoDato(tokenActual.getToken()))
+                if (!tipoDato(tokenActual.getToken()))
                     error("Se esperaba un tipo de dato válido en la línea " + tokenActual.getNo_linea());
                 avanza();
                 tokenActual = tokens.get(indice);
-                if(tokenActual.getToken() != -77)
+                if (tokenActual.getToken() != -77)
                     error("Se esperaba ':' después del tipo de dato en la línea " + tokenActual.getNo_linea());
                 avanza();
                 declaracionVariable();
@@ -149,7 +147,7 @@ public class AnalizadorSintactico {
         estructuraSentencias();
         tokenActual = tokens.get(indice);
         // Se verifica que termine con un end
-        if(indice == tokens.size() - 1 && tokenActual.getToken() != -3)
+        if (indice == tokens.size() - 1 && tokenActual.getToken() != -3)
             error("Se esperaba la palabra clave 'end' en la línea " + tokenActual.getNo_linea());
         // Si termina con un end se termina el programa sin errores
         if (tokenActual.getToken() == -3 && indice == tokens.size() - 1) {
@@ -293,7 +291,8 @@ public class AnalizadorSintactico {
             case -4 -> lectura(); // Esto verifica la estructura de un read
             case -5 -> writeEstructura(); // Esto verifica la estructura de un write
             case -6 -> ifEstructura();
-            case -7 -> error("Se esperaba un 'if' en la línea " + tokenActual.getNo_linea());  // Esto verifica la estructura de un else
+            case -7 ->
+                    error("Se esperaba un 'if' en la línea " + tokenActual.getNo_linea());  // Esto verifica la estructura de un else
             case -8, -9 -> repetitivas();  // Esto verifica la estructura de un while
             case -51, -52, -53, -54 -> asignacion(); // Esto verifica la estructura de una asignacion
             default -> error("Se esperaba una sentencia válida en la línea " + tokenActual.getNo_linea());
@@ -342,7 +341,7 @@ public class AnalizadorSintactico {
             error("Se esperaba un identificador o una constante en la línea " + tokenActual.getNo_linea());
         avanza();
         tokenActual = tokens.get(indice);
-        if(isOperando(tokenActual.getToken())) {
+        if (isOperando(tokenActual.getToken())) {
             aritmetica();
             return;
         }

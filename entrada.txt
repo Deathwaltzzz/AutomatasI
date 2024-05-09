@@ -7,7 +7,6 @@ var
  begin
     uno& :=  10 + ( 39 * dos& ) ;
     cinco$  := ( uno& <= 10 );
-
     if ( uno& > 10 ) then
     begin
         write (dos&);
@@ -20,15 +19,15 @@ var
     dos& := 1;
     while ( dos& >  5 ) do
     begin
-    dos& := dos& + 1;
-    write ( dos&) ;
+        dos& := dos& + 1;
+        write ( dos&) ;
     end
     cinco$ := false;
     repeat
     begin
-    dos& := dos& + 2;
-    write (dos&);
-    read ( tres% );
+        dos& := dos& + 2;
+        write (dos&);
+        read ( tres% );
     end
     until ( cinco$ == true );
 end

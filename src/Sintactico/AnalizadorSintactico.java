@@ -6,8 +6,6 @@ public class AnalizadorSintactico {
     private final List<Token> tokens;
     private int indice;
     private Token proximoToken;
-    private int cantEnd = 0;
-    private int cantBegin = 0;
 
     public AnalizadorSintactico(List<Token> tokens) {
         this.tokens = tokens;
@@ -51,9 +49,8 @@ public class AnalizadorSintactico {
     }
 
     private void aceptar() {
-        cantEnd++;
         System.out.println((char) 27 + "[32m" + "El análisis sintáctico ha finalizado sin errores.");
-        System.out.printf(cantBegin == cantEnd ? "El programa es correcto\n" : "El programa no es correcto\n");
+        System.out.println("El programa es correcto\n");
     }
 
     private void encabezado() {
@@ -100,7 +97,7 @@ public class AnalizadorSintactico {
                 error("Se esperaba la palabra clave 'var' en la línea " + tokenActual.getNo_linea());
             } else {
                 if (!tipoDato(tokenActual.getToken()))
-                    error("Se esperaba un tipo de dato válido en la línea " + tokenActual.getNo_linea());
+                    error("Se esperaba un tipo de dato válido o un 'begin' en la línea " + tokenActual.getNo_linea());
                 avanza();
                 tokenActual = tokens.get(indice);
                 if (tokenActual.getToken() != -77)
@@ -141,7 +138,6 @@ public class AnalizadorSintactico {
         Token tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -2)
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
-        cantBegin++;
         avanza();
         /*Originalmente era un while pero lo cambie por el metodo recursivo*/
         estructuraSentencias();
@@ -276,7 +272,6 @@ public class AnalizadorSintactico {
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -2)
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
-        cantBegin++;
         avanza();
         estructuraSentencias();
         avanza();
@@ -392,13 +387,11 @@ public class AnalizadorSintactico {
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -2)
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
-        cantBegin++;
         avanza();
         estructuraSentencias();
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -3)
             error("Se esperaba la palabra clave 'end' en la línea " + tokenActual.getNo_linea());
-        cantEnd++;
     }
 
     //////////Estructuras repetitivas
@@ -428,13 +421,11 @@ public class AnalizadorSintactico {
                 avanza();
                 tokenActual = tokens.get(indice);
                 if (tokenActual.getToken() == -2) {
-                    cantBegin++;
                     avanza();
                     estructuraSentencias();
                     tokenActual = tokens.get(indice);
                     if (tokenActual.getToken() == -3) {
                         avanza();
-                        cantEnd++;
                         // Aqui se regresa a la condicion
                     } else
                         error("Se esperaba la palabra clave 'end' en la linea " + tokenActual.getNo_linea());
@@ -453,7 +444,6 @@ public class AnalizadorSintactico {
         Token tokenActual = tokens.get(indice);
         if (tokenActual.getToken() == -2) {
             avanza();
-            cantBegin++;
             estructuraSentencias();
             tokenActual = tokens.get(indice);
             if (tokenActual.getToken() == -3) {
@@ -470,7 +460,6 @@ public class AnalizadorSintactico {
                             tokenActual = tokens.get(indice);
                             if (tokenActual.getToken() == -75) {
                                 avanza();
-                                cantEnd++;
                             } else {
                                 error("Se esperaba la palabra clave ';' en la linea " + tokenActual.getNo_linea());
                             }

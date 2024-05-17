@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class Main {
     public static void main(String[] args) {
         List<Token> tokens = new ArrayList<>();
-        new Practica4_Eq1().main(args);
+        Practica4_Eq1.main(args);
         try (BufferedReader br = new BufferedReader(new FileReader("tokens.txt"))) {
             String line;
             int lineNumber = 1;
@@ -36,13 +36,6 @@ public class Main {
         } catch (IOException e) {
             System.out.println("Error al leer el archivo de tokens.");
         }
-
-        /**
-         * for (Token token : tokens) {
-         System.out.println(token);
-         }
-         */
-
         AnalizadorSintactico as = new AnalizadorSintactico(tokens);
     }
 }

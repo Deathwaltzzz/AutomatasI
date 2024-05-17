@@ -4,20 +4,19 @@ var
     real : tres% ;
     string : cuatro#;
     bool : cinco$ ;
- begin
-    uno& :=  10 + ( 39 * dos& ) ;
-    cinco$  := ( uno& <= 10 );
-    if ( uno& > 10 ) then
+begin
+    uno& := 10 + ( 39 * dos& ) ; cinco$ := ( !uno& <= 10 );
+    if( uno& > 10 ) then
     begin
         write (dos&);
     end
     else
     begin
         write ( dos&);
-        cinco$ := ( 10  * (89 - 100) ) >= ( dos& ) ;
+        cinco$ := ( 10 * (89 - 100) ) && ( dos& ) ;
     end
     dos& := 1;
-    while ( dos& >  5 ) do
+    while ( dos& || 5 ) do
     begin
         dos& := dos& + 1;
         write ( dos&) ;
@@ -29,5 +28,5 @@ var
         write (dos&);
         read ( tres% );
     end
-    until ( cinco$ == true );
+    until ( cinco# == true);
 end

@@ -7,6 +7,7 @@ public class AnalizadorSintactico {
     private int indice;
     private Token proximoToken;
 
+
     public AnalizadorSintactico(List<Token> tokens) {
         this.tokens = tokens;
         this.indice = 0;
@@ -22,7 +23,8 @@ public class AnalizadorSintactico {
             error("No se esperaba la palabra clave 'end' en la línea " + tokens.get(indice).getNo_linea());
         } catch (Exception e) {
             if (e instanceof IndexOutOfBoundsException || e instanceof NullPointerException)
-                error("Ocurrio un error catastrofico! " + "cerraste todos tus begin con end? \nComprueba la linea " + tokens.get(indice - 1).getNo_linea());
+                error("Se esperaba end para finalizar el programa en la linea "
+                        + tokens.get(indice - 1).getNo_linea() + 1);
             error("Ocurrio un error catastrofico! " + e.getMessage());
         }
     }
@@ -50,7 +52,7 @@ public class AnalizadorSintactico {
 
     private void aceptar() {
         System.out.println((char) 27 + "[32m" + "El análisis sintáctico ha finalizado sin errores.");
-        System.out.println("El programa es correcto\n");
+        System.out.printf("El programa es correcto\n");
     }
 
     private void encabezado() {
@@ -89,15 +91,14 @@ public class AnalizadorSintactico {
                 avanza();
                 varEncontrada = true;
             } else {
-                error("La palabra clave 'var' ya fue declarada anteriormente en la línea "
-                        + tokenActual.getNo_linea());
+                error("La palabra clave 'var' ya fue declarada anteriormente en la línea " + tokenActual.getNo_linea());
             }
         } else {
             if (!varEncontrada) {
                 error("Se esperaba la palabra clave 'var' en la línea " + tokenActual.getNo_linea());
             } else {
                 if (!tipoDato(tokenActual.getToken()))
-                    error("Se esperaba un tipo de dato válido o un 'begin' en la línea " + tokenActual.getNo_linea());
+                    error("Se esperaba un tipo de dato valido o la palabra ´begin', en la linea: " + tokenActual.getNo_linea());
                 avanza();
                 tokenActual = tokens.get(indice);
                 if (tokenActual.getToken() != -77)
@@ -139,7 +140,7 @@ public class AnalizadorSintactico {
         if (tokenActual.getToken() != -2)
             error("Se esperaba la palabra clave 'begin' en la línea " + tokenActual.getNo_linea());
         avanza();
-        /*Originalmente era un while pero lo cambie por el metodo recursivo*/
+        /* Originalmente era un while pero lo cambie por el metodo recursivo */
         estructuraSentencias();
         tokenActual = tokens.get(indice);
         // Se verifica que termine con un end
@@ -152,9 +153,10 @@ public class AnalizadorSintactico {
         }
     }
 
-    // este metodo sirve para el bloque de operaciones dentro del begin como por ejmplo:
-    //uno& := 10 + ( 39 * dos& ) ;
-    //cinco$ := ( uno& <= 10 );
+    // este metodo sirve para el bloque de operaciones dentro del begin como por
+    // ejmplo:
+    // uno& := 10 + ( 39 * dos& ) ;
+    // cinco$ := ( uno& <= 10 );
     private void asignacion() {
         Token tokenActual = tokens.get(indice);
         if (identificador(tokenActual.getToken())) {
@@ -184,7 +186,8 @@ public class AnalizadorSintactico {
         }
     }
 
-    //este metodo valida que cualquier expresion(aritmetoca, logica, relacionales) sea valida
+    // este metodo valida que cualquier expresion(aritmetoca, logica, relacionales)
+    // sea valida
     private boolean expresion() {
         if (termino()) {
             while (opRelacionales(tokens.get(indice).getToken()) || opAritmeticos(tokens.get(indice).getToken())
@@ -278,7 +281,6 @@ public class AnalizadorSintactico {
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() == -7)
             elseEstructura();
-        avanza();
     }
 
     private void comprobarSentencias(Token tokenActual) {
@@ -286,9 +288,9 @@ public class AnalizadorSintactico {
             case -4 -> lectura(); // Esto verifica la estructura de un read
             case -5 -> writeEstructura(); // Esto verifica la estructura de un write
             case -6 -> ifEstructura();
-            case -7 ->
-                    error("Se esperaba un 'if' en la línea " + tokenActual.getNo_linea());  // Esto verifica la estructura de un else
-            case -8, -9 -> repetitivas();  // Esto verifica la estructura de un while
+            case -7 -> error("Se esperaba un 'if' en la línea " + tokenActual.getNo_linea()); // Esto verifica la estructura
+            // de un else
+            case -8, -9 -> repetitivas(); // Esto verifica la estructura de un while
             case -51, -52, -53, -54 -> asignacion(); // Esto verifica la estructura de una asignacion
             default -> error("Se esperaba una sentencia válida en la línea " + tokenActual.getNo_linea());
         }
@@ -392,9 +394,10 @@ public class AnalizadorSintactico {
         tokenActual = tokens.get(indice);
         if (tokenActual.getToken() != -3)
             error("Se esperaba la palabra clave 'end' en la línea " + tokenActual.getNo_linea());
+        avanza();
     }
 
-    //////////Estructuras repetitivas
+    ////////// Estructuras repetitivas
 
     private void repetitivas() {
         Token tokenActual = tokens.get(indice);
@@ -479,7 +482,6 @@ public class AnalizadorSintactico {
             error("Se esperaba la palabra clave 'begin' en la linea " + tokenActual.getNo_linea());
         }
     }
-
 
     @SuppressWarnings("unlikely-arg-type")
     private void lectura() {
@@ -581,6 +583,6 @@ public class AnalizadorSintactico {
     }
 
     private boolean opLogicos(int token) {
-        return token == -31 || token == -32 || token == -33 || token == -34 || token == -35 || token == -36;
+        return token == -41 || token == -42;
     }
-}
+}//fin d ela clase
